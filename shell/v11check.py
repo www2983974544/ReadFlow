@@ -306,6 +306,50 @@ def _checks() -> None:
     time.sleep(0.2)
     js("modal.closedAgain", "document.getElementById('modalCustomImport').classList.contains('hidden')")
 
+    # --- vocab page: flashcard refactor + segmented filter active state ---
+    js(
+        "vocab2.remark",
+        "document.getElementById('navTabReader').click(), "
+        "document.querySelector('#readerParagraphsContainer .word-token').click(), "
+        "document.getElementById('btnMarkCore').click()",
+    )
+    time.sleep(0.8)
+    js("vocab2.nav", "document.getElementById('navTabVocab').click()")
+    time.sleep(0.4)
+    visible("viewVocab")
+    js("vocab2.cardCount", "document.querySelectorAll('#vocabNotebookGrid .surface-card').length")
+    js("vocab2.speakInHeader", "!!document.querySelector('#vocabNotebookGrid .btn-vocab-speak')")
+    js("vocab2.detailsFold", "!!document.querySelector('#vocabNotebookGrid details')")
+    js("vocab2.filterActiveInit", "document.getElementById('btnFilterVocabAll').className.includes('bg-white')")
+    js("vocab2.filterSwitch", "document.getElementById('btnFilterVocabUnknown').click()")
+    time.sleep(0.2)
+    js("vocab2.unknownActive", "document.getElementById('btnFilterVocabUnknown').className.includes('bg-white')")
+    js("vocab2.maskToggle", "document.getElementById('btnToggleFlashcardMask').click()")
+    time.sleep(0.2)
+    js("vocab2.maskBtnText", "document.getElementById('btnToggleFlashcardMask').textContent.slice(0, 3)")
+    js("vocab2.exportBtnPresent", "!!document.getElementById('btnExportVocabCsv')")
+
+    # --- stats page: monochrome numerals + segmented hm slot + ghost reset ---
+    js("nav stats", "document.getElementById('navTabStats').click()")
+    time.sleep(0.4)
+    visible("viewStats")
+    js("stats.monoNum", "document.getElementById('statPageTotalHours').className.includes('font-mono')")
+    js("stats.noRainbow", "!document.getElementById('statPageVocabCount').className.includes('text-rose-600')")
+    js("stats.hmSlotActive", "document.querySelector('.hm-mode-btn[data-hmtype=all]').className.includes('bg-white')")
+    js("stats.hmSwitch", "document.querySelector('.hm-mode-btn[data-hmtype=words]').click()")
+    time.sleep(0.2)
+    js("stats.hmSwitched", "document.querySelector('.hm-mode-btn[data-hmtype=words]').className.includes('bg-white')")
+    js("stats.resetGhost", "document.getElementById('btnResetAllStats').className.includes('text-slate-500') && !document.getElementById('btnResetAllStats').classList.contains('bg-rose-50')")
+    js("stats.checkin", "document.getElementById('btnLogStudySession').click()")
+    time.sleep(1.0)
+    js("stats.todayMins", "document.getElementById('statPageTodayMins').textContent")
+    js("stats.cells", "document.querySelectorAll('#githubHeatmapGrid .hm-cell').length")
+    js("stats.bars", "document.querySelectorAll('#chart14DaysBars > div').length")
+    js("stats.cats", "document.querySelectorAll('#categoryMasteryContainer > div').length")
+    js("stats.reset", "document.getElementById('btnResetAllStats').click()")
+    time.sleep(1.2)
+    js("stats.afterReset", "document.getElementById('statPageTotalHours').textContent")
+
     # --- 安徽专升本 level support ---
     js("modal.levelSelect", "!!document.getElementById('customInputLevel')")
     js("crawler.levelOption", "[...document.getElementById('crawlTargetLevel').options].some(o=>o.value==='安徽专升本')")

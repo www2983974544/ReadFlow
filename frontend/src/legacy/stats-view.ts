@@ -98,12 +98,12 @@ export function renderStatsAndHeatmap() {
         const hPct = item.mins > 0 ? Math.max(12, Math.round((item.mins / maxMins) * 100)) : 4
         const shortDate = item.date.slice(5)
         const isToday = i === last14.length - 1
-        const barCol = item.mins > 0 ? (isToday ? 'bg-indigo-600' : 'bg-indigo-500/80') : 'bg-slate-200'
+        const barCol = item.mins > 0 ? (isToday ? 'bg-indigo-600' : 'bg-indigo-500/80') : 'bg-slate-200/70'
         return `
             <div class="flex-1 flex flex-col items-center justify-end h-full group">
-              <div class="text-[10px] font-bold opacity-75 mb-1">${item.mins}m</div>
-              <div class="w-full max-w-[26px] rounded-t-lg transition-all ${barCol}" style="height:${hPct}%;"></div>
-              <div class="text-[10px] opacity-65 mt-1.5 truncate">${isToday ? '今日' : shortDate}</div>
+              <div class="text-[10px] font-mono opacity-70 mb-1">${item.mins}m</div>
+              <div class="w-full max-w-[26px] rounded-t-md transition-all ${barCol}" style="height:${hPct}%;"></div>
+              <div class="text-[10px] font-mono opacity-65 mt-1.5 truncate">${isToday ? '今日' : shortDate}</div>
             </div>
           `
       })
@@ -126,11 +126,11 @@ export function renderStatsAndHeatmap() {
         const pct = Math.min(100, finInCat * 25)
         return `
             <div>
-              <div class="flex justify-between font-semibold mb-1">
+              <div class="flex justify-between items-center font-semibold mb-1">
                 <span>${cat.label}</span>
-                <span class="${cat.colorText}">${pct}% (${finInCat} 篇)</span>
+                <span class="${cat.colorText} font-mono">${pct}% (${finInCat} 篇)</span>
               </div>
-              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                 <div class="h-full ${cat.colorBar} rounded-full transition-all" style="width:${pct}%;"></div>
               </div>
             </div>
@@ -161,8 +161,8 @@ export function initStatsView() {
       document.querySelectorAll('.hm-mode-btn').forEach((b) => {
         b.className =
           b === btn
-            ? 'hm-mode-btn px-3 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white'
-            : 'hm-mode-btn px-3 py-1.5 rounded-lg font-medium bg-slate-100 text-slate-700 hover:bg-slate-200'
+            ? 'hm-mode-btn px-3 py-1.5 rounded-md font-semibold bg-white text-indigo-700 shadow-sm'
+            : 'hm-mode-btn px-3 py-1.5 rounded-md font-medium text-slate-600'
       })
       renderStatsAndHeatmap()
     })
