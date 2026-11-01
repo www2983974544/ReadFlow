@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   ReadFlow Android · 移动版样式基础
+   主题变量与桌面 frontend/src/style.css 保持一致（三主题 body class 方案），
+   布局按移动优先重写：header + 可滚动视图 + 底部标签栏，safe-area 全适配。
+   ========================================================================== */
+:root {
+  --bg-main: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-reader: #ffffff;
+  --bg-subcard: #f8fafc;
+  --bg-elevated: #f1f5f9;
+  --bg-input: #ffffff;
+  --text-main: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --border-col: #e2e8f0;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --hm-lv0: #ebedf0;
+  --hm-lv1: #9be9a8;
+  --hm-lv2: #40c463;
+  --hm-lv3: #30a14e;
+  --hm-lv4: #216e39;
+  --header-h: 52px;
+  --tabbar-h: 56px;
+}
+
+body.theme-sepia {
+  --bg-main: #e6dbc6;
+  --bg-card: #f5eedf;
+  --bg-reader: #faf4e8;
+  --bg-subcard: #ede3cf;
+  --bg-elevated: #e2d5be;
+  --bg-input: #fbf7ef;
+  --text-main: #2b2017;
+  --text-secondary: #4a3828;
+  --text-muted: #725b47;
+  --border-col: #d3c2a6;
+  --accent: #b45309;
+  --accent-soft: #f3e4c8;
+  --hm-lv0: #e2d5be;
+  --hm-lv1: #a7d7a9;
+  --hm-lv2: #5cb860;
+  --hm-lv3: #3d8b40;
+  --hm-lv4: #255827;
+}
+
+body.theme-dark {
+  --bg-main: #090d16;
+  --bg-card: #111827;
+  --bg-reader: #131c2e;
+  --bg-subcard: #1e293b;
+  --bg-elevated: #263449;
+  --bg-input: #0f172a;
+  --text-main: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-col: #2d3d56;
+  --accent: #6366f1;
+  --accent-soft: #1e1b4b;
+  --hm-lv0: #1e293b;
+  --hm-lv1: #0e4429;
+  --hm-lv2: #006d32;
+  --hm-lv3: #26a641;
+  --hm-lv4: #39d353;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.serif-article {
+  font-family: Georgia, Cambria, 'Times New Roman', 'Songti SC', serif;
+}
+
+.surface-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-col);
+  color: var(--text-main);
+  border-radius: 14px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.reader-surface {
+  background-color: var(--bg-reader);
+  border: 1px solid var(--border-col);
+  color: var(--text-main);
+  border-radius: 14px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* 三主题下输入控件的底色覆盖（沿桌面方案） */
+body.theme-sepia select,
+body.theme-sepia input,
+body.theme-sepia textarea,
+body.theme-dark select,
+body.theme-dark input,
+body.theme-dark textarea {
+  background-color: var(--bg-input) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-col) !important;
+}
+body.theme-dark option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* 主滚动视图：每个页面视图内部独立滚动，绝不与底部导航/头部互相遮挡 */
+.view-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px;
+}
+
+/* 通用按钮 */
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid var(--border-col);
+  background-color: var(--bg-subcard);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip-btn.chip-active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+.chip-btn:disabled {
+  opacity: 0.55;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: var(--accent);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.primary-btn:disabled {
+  opacity: 0.55;
+}
+
+/* 零抖动词元样式（沿桌面 v0.6 方案） */
+.word-token {
+  display: inline;
+  padding: 1px 2px;
+  margin: 0;
+  border-radius: 4px;
+  border-bottom: 2px solid transparent;
+  font-weight: inherit !important;
+  letter-spacing: normal !important;
+  cursor: pointer;
+  transition: background-color 0.08s ease, color 0.08s ease, border-color 0.08s ease;
+  position: relative;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.word-token:active {
+  background-color: rgba(99, 102, 241, 0.28);
+}
+.word-token.active-word {
+  background-color: var(--accent) !important;
+  color: #ffffff !important;
+  font-weight: inherit !important;
+  border-bottom-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.word-mark-unknown {
+  background-color: rgba(244, 63, 94, 0.16);
+  border-bottom-color: #f43f5e;
+  color: #be123c;
+}
+.word-mark-core {
+  background-color: rgba(245, 158, 11, 0.18);
+  border-bottom-color: #f59e0b;
+  color: #b45309;
+}
+.word-mark-mastered {
+  background-color: rgba(16, 185, 129, 0.14);
+  border-bottom: 2px dotted #10b981;
+  color: #047857;
+}
+body.theme-dark .word-mark-unknown {
+  background-color: rgba(244, 63, 94, 0.25);
+  border-bottom-color: #fb7185;
+  color: #fda4af;
+}
+body.theme-dark .word-mark-core {
+  background-color: rgba(245, 158, 11, 0.25);
+  border-bottom-color: #fbbf24;
+  color: #fcd34d;
+}
+body.theme-dark .word-mark-mastered {
+  background-color: rgba(16, 185, 129, 0.22);
+  border-bottom: 2px dotted #34d399;
+  color: #6ee7b7;
+}
+.word-cet-hint {
+  border-bottom: 2px dashed rgba(99, 102, 241, 0.45);
+}
+.ruby-note {
+  font-size: 0.64rem;
+  font-weight: 600;
+  padding: 0 3px;
+  margin-left: 2px;
+  border-radius: 3px;
+  vertical-align: baseline;
+  display: inline;
+}
+.speaking-para-highlight {
+  background-color: rgba(99, 102, 241, 0.08) !important;
+  border-left: 3px solid var(--accent) !important;
+}
+
+/* 热力图（沿桌面色阶） */
+.hm-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 12px;
+}
+.hm-lv-0 { background-color: var(--hm-lv0); }
+.hm-lv-1 { background-color: var(--hm-lv1); }
+.hm-lv-2 { background-color: var(--hm-lv2); }
+.hm-lv-3 { background-color: var(--hm-lv3); }
+.hm-lv-4 { background-color: var(--hm-lv4); }
+
+/* 滚动条（桌面观感一致） */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
+}
+
+/* 空状态卡片（居中排版规范） */
+.empty-state {
+  text-align: center;
+  padding: 36px 20px;
+  border: 1px dashed var(--border-col);
+  border-radius: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
