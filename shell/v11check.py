@@ -105,6 +105,10 @@ def _checks() -> None:
     time.sleep(0.8)
     js("mark.coreCount", "document.querySelectorAll('.word-mark-core').length")
     js("mark.countBadge", "document.getElementById('countArticleMarked').textContent")
+    js("mark.clearKey0", "document.dispatchEvent(new KeyboardEvent('keydown', {key: '0', bubbles: true}))")
+    time.sleep(0.6)
+    js("mark.clearedCount", "document.querySelectorAll('.word-mark-core').length")
+    js("mark.badgeAfterClear", "document.getElementById('countArticleMarked').textContent")
 
     # --- quiz regression (open details first) ---
     js("quiz.open", "[...document.querySelectorAll('#mainArticleSurface details')].forEach(d=>d.open=true)")

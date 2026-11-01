@@ -328,8 +328,8 @@ onMounted(() => {
     <aside id="leftSidebarPane" class="left-sidebar-box flex flex-col min-h-0">
       <div class="independent-scroll-pane space-y-3 pr-1 flex-1 min-h-0">
         <div class="surface-card p-3 shadow-sm">
-          <div class="flex items-center justify-between mb-2.5">
-            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">文章目录</span>
+          <div class="relative flex items-center justify-end mb-2.5">
+            <span class="absolute left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-wider text-indigo-600">文章目录</span>
             <div class="flex items-center gap-1.5">
               <button id="btnOpenCustomImport" type="button" class="text-xs font-semibold text-indigo-600 hover:underline">
                 + 导入
@@ -596,7 +596,7 @@ onMounted(() => {
                 </button>
               </div>
               <button id="btnClearWordMark" type="button" class="w-full mt-1.5 py-1 rounded-lg text-xs text-slate-500 hover:bg-slate-100 transition">
-                清除该词标注状态
+                清除该词标注状态 (快捷键 0)
               </button>
             </div>
 

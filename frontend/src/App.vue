@@ -12,6 +12,7 @@ import { S, hydrateExamSettings } from './legacy/state'
 import { applySidebarCollapseLayout, applyThemeMode, showToast, updateTopBadgesAndStats } from './legacy/ui-fns'
 import {
   clearActiveWordSelection,
+  clearWordMark,
   markCurrentWord,
   renderCurrentArticle,
   renderSidebarArticleList,
@@ -124,6 +125,7 @@ onMounted(async () => {
     else if (e.key === '1') void markCurrentWord('unknown')
     else if (e.key === '2') void markCurrentWord('core')
     else if (e.key === '3') void markCurrentWord('mastered')
+    else if (e.key === '0') void clearWordMark()
     else if (e.key.toLowerCase() === 's') speakSingleWord(S().activeWord)
     else if (e.key.toLowerCase() === 'b') document.getElementById('btnToggleBilingual')?.click()
   })
