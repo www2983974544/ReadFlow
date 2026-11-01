@@ -1,36 +1,35 @@
-# ReadFlow Android（四六级精读器 APK）
+# ReadFlow Android v2（四六级精读器 · 移动版）
 
-基于 Gemini 版 ReadFlow v1.1（Windows 网页版）完整移植的安卓应用。
-**功能 100% 保留**（首页星环倒计时 / 外刊精读 / 文章获取 / 文章库 / 单词库 / 时间统计 / 三主题 / 离线词典 / 朗读 / 三色标注 / 导出），仅更换了底层载体与移动端 UI 适配。
+基于桌面 **ReadFlow V2.1**（Vue3 + FastAPI + pywebview，git tag v2.1）的完整安卓移植。
+与桌面版**功能逐项对齐**（六视图 / 专注阅读模式 / 三 Tab 查词台 / 真 RSS 爬虫 / 三联筛选 / 闪卡 / 热力图 / 安徽专升本全链路），UI 按手机习惯全新设计（移动优先，非桌面布局套壳）。
 
-## 技术架构
-- **Web 层**：`www/index.html` —— 原版 `cet_reading_master.html` 的副本，追加了一层移动端适配 CSS 与一个桥接 shim 脚本（原 JS 逻辑零改动）；Tailwind 已本地化（`www/tailwind.js`），离线可用。
-- **原生壳**：Capacitor 8（`com.readflow.app`），WebView 加载本地资源。
-- **原生能力桥接**（仅安卓环境启用，浏览器中自动走原 Web 路径）：
-  - 语音兜底：Web Speech API → 系统原生 TTS（`@capacitor-community/text-to-speech`）
-  - 导出 CSV/JSON：blob 下载 → 写入文档目录 + 系统分享面板（Filesystem + Share）
-  - 安卓返回键：关闭弹层/抽屉 → 返回首页 → 退出
-  - 音频自动播放：`MainActivity` 中放开逐段手势限制（全文朗读队列需要）
+## 架构
+- **移动优先 Vue3 + Vite + TS + Pinia + Tailwind**（`src/`），自包含工程
+- 纯逻辑模块复制自 `frontend/src@v2.1`（文件头有标注）：dictionary / state(S()桥) / reader / translate / timer / inspector-tabs / crawler-view / library / vocab-view / stats-view / home / cosmos
+- **持久化**：桌面为 FastAPI+SQLite；移动端为 localStorage（JSON shape 完全一致，跨实体清零守卫端内复刻）
+- **Capacitor 8 壳**（`android/`，com.readflow.app，minSdk 24）：
+  - TTS：有道真人音频（联网）→ 离线走 `native/tts-shim.ts`（Web Speech API → 原生 TTS 桥）
+  - 爬虫：`native/crawler.ts` = CapacitorHttp（原生网络栈绕 CORS）+ fast-xml-parser + @mozilla/readability，逐行复刻 news.py 的 12s 时限 / 60d 时效 / 段落切分 / 词数分级 / Wikipedia 兜底
+  - 导出：`native/exporter.ts` = Filesystem 写入 + 系统分享面板（浏览器回退 blob 下载）
+  - 返回键：弹窗 → 查词台 → 抽屉 → 首页 → 退出
 
-## 手机端 UI 适配（≤900px 生效，平板/桌面保持原三栏布局）
-- 顶部 6 页签 → 底部标签栏（角标实时同步）
-- 左侧文章目录 → 侧滑抽屉（工具栏「◀ 左栏」开关，点遮罩关闭）
-- 右侧查词台 → 底部弹层（点词自动弹出，收起按钮/返回键关闭）
-- 安全区适配、触控目标加大、星空动画支持触屏视差
+## 移动 UI（与桌面一一对应）
+- 底部 6 键标签栏（角标实时同步）+ 精简头部（品牌/版本/三主题/❓）
+- 精读页：单栏正文 + 目录侧滑抽屉（含筛选与统计条）+ 查词台底部弹层（三 Tab，点词自动弹出，非模态可连续查词）+ 单行横滑工具栏 + 段落按钮常显
+- 三主题（明亮/护眼/夜间）与设置持久化
 
-## 数据存储
-与 Windows 版同机制：localStorage 存于应用私有目录，重启/关机不丢，卸载才清除。请定期用「导出备份」留底。
-
-## 构建
+## 构建与发布
 ```bash
-# 依赖：Node 20+、JDK 21（已在 gradle.properties 配置）、Android SDK（已在 local.properties 配置）
 npm install
-npx cap sync android
-cd android && ./gradlew assembleDebug
-# 产物：android/app/build/outputs/apk/debug/app-debug.apk
+npm run apk        # vite build + cap sync + gradlew assembleDebug
+# 产物: android/app/build/outputs/apk/debug/app-debug.apk → dist/ReadFlow_v2.1_android.apk
 ```
+工具链：JDK 21（`C:/Users/wzc/.jdks/ms-21.0.10`，见 gradle.properties）+ Android SDK（`C:/Users/wzc/AppData/Local/Android/Sdk`，见 local.properties）。
 
 ## 安装到手机
-1. 将 `dist/ReadFlow_v1.1_android.apk` 传到手机（微信文件传输助手/数据线/网盘均可）。
-2. 手机上点击安装；若提示「禁止安装未知来源应用」，允许该来源安装即可（系统不同入口：设置 → 安全 → 安装未知应用，或安装时弹窗里点「仍要安装」）。
-3. 首次打开即可离线使用；单词真人发音与全文朗读联网时使用有道真人录音，离线时用系统语音引擎（建议在 系统设置 → 文字转语音 中安装英语语音包以获得更好音质）。
+1. 将 `dist/ReadFlow_v2.1_android.apk` 传到手机（微信文件传输助手/数据线均可）。
+2. 点开安装；提示"未知来源"时选择允许/仍要安装。
+3. 若已装旧版 v1.1 APK（versionCode 1），可直接覆盖安装（versionCode 2，数据兼容）。
+
+## 版本
+- v2.1.0（versionCode 2）：与桌面 V2.1 功能对齐的移动版重构。
