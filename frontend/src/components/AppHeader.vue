@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { APP_VERSION } from '../version'
 import { S } from '../legacy/state'
 import { applyThemeMode, showToast } from '../legacy/ui-fns'
 import { useUiStore } from '../stores/ui'
@@ -55,7 +56,7 @@ function onQuickCrawl() {
         <div class="truncate">
           <div class="flex items-center gap-1.5">
             <h1 class="font-bold text-base sm:text-lg tracking-tight truncate" style="margin: 0">ReadFlow</h1>
-            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">v1.1</span>
+            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">{{ APP_VERSION }}</span>
             <span
               id="networkModeBadge"
               class="hidden 2xl:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap"

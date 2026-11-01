@@ -226,24 +226,48 @@ onMounted(async () => {
   <div id="modalWindowsGuide" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" :class="{ hidden: !ui.guideOpen }">
     <div class="surface-card max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[88vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-        <h3 class="text-base font-bold">🚀 ReadFlow 版本更新记录 (v0.1 – v1.1) & Windows 上手指南</h3>
+        <h3 class="text-base font-bold">🚀 ReadFlow 版本更新记录 &amp; 上手指南</h3>
         <button id="btnCloseWindowsGuide" type="button" class="text-slate-400 hover:text-slate-700 text-lg font-bold" @click="ui.guideOpen = false">✕</button>
       </div>
       <div class="space-y-3 text-xs leading-relaxed">
         <div class="p-3.5 rounded-xl bg-indigo-50/80 border border-indigo-200 text-indigo-950 space-y-2">
-          <strong>📜 ReadFlow 版本迭代历史 (CHANGELOG)：</strong>
-          <ul class="list-disc pl-5 space-y-1.5">
-            <li><strong>v1.1（当前版本 · 蓝宝石光学星环 + 180格高斯光波刻度 + 3D倾角交互 + 极光星云宇宙）：</strong>中央圆环升级为高定蓝宝石水晶透镜质感，支持鼠标 3D 空间透视倾角、180 格激光刻度连续高斯光波拖尾、十字星芒光子节点与悬浮胶囊读数；宇宙背景新增引力透镜同轴吸积光晕、动态呼吸极光星云丝带与鼠标流光星尘涟漪。</li>
-            <li><strong>v1.0（深空星云银河背景 + 极简高定流光圆环倒计时）：</strong>移除传统手表指针与冗余当前时间显示，升级为高定通透玻璃拟态「流光圆环倒计时」（含 120 段激光微雕动态点亮刻度环、光学辉光进度环与 60FPS 丝滑秒级脉冲光子）；底层重构为离屏高精银河尘埃带、多层船底座体积星云、1200+ 微星尘、24 颗十字衍射星芒亮星与 3D 鼠标视差深空宇宙。</li>
-            <li><strong>v0.9（浩瀚星空背景 + 单一全息时钟倒计时）：</strong>将首页重构为唯美震撼的 60FPS「浩瀚星空（含闪烁恒星、深空星云与动态流星）」背景，摒弃“1大+4小”分散表盘，将天/时/分/秒全部浓缩汇总进中央唯一一个 120 刻度巨型全息星际时钟表盘内。</li>
-            <li><strong>v0.8（时钟倒计时首页重构 + 个人统计数据清零初始化）：</strong>移除首页底部冗余子模块（AI智能精读任务舱、高频词速刷舱、实时备考战力矩阵），将主页倒计时升级为「60刻度全息三环指针机械时钟 + 天/时/分/秒四联圆形时钟进度表盘」；将「时间统计」模块内所有个人历史统计数据、热力图、趋势图与题型覆盖率全部清空归零，实现100%从零真实记录，并新增一键清空重置按钮。</li>
-            <li><strong>v0.7（科技感倒计时首页 + GitHub热力图时间统计 + 布局修复）：</strong>新增炫酷科技感「首页」（默认显示英语六级倒计时，支持自定义考试类型与日期，点击倒计时直达外刊精读，含 AI 每日任务舱与高频词速刷舱）；新增「个人时间统计页」（含 52周×7天仿 GitHub 学习贡献热力图、6 大统计指标与 14 天趋势图）；修复功能栏右侧遮挡问题（左右收起按钮独立同行 + 功能栏自适应排列）；修复两侧栏同时收起后中间文章消失的 Bug。</li>
-            <li><strong>v0.6（全量主题适配与零抖动交互升级）：</strong>深度重构明亮/护眼/夜间三大模式全子模块配色；修复「词句离线解析与翻译台」支持整句译文与逐词详细词义；支持点击正文空白处取消单词选中；消除点击不同单词时的正文“乱动”抖动；新增两栏中间空隙悬浮图标直点收起功能。</li>
-            <li><strong>v0.5（品牌定名与工程化升级）：</strong>正式定名为 <strong>ReadFlow</strong>；新增点击左上角品牌图标/文字一键返回首页；导航精简；新增版本演进档案 <code>ReadFlow_CHANGELOG.md</code>；升级专业工程级 <code>.bat</code> 启动脚本注释。</li>
-            <li><strong>v0.4（深度精读与交互进阶）：</strong>阅读计时器支持自定义分钟数；文章朗读升级为在线真人级神经播音流预加载队列 + 离线意群语调模型；「标记精读完成」支持一键取消；查词栏与单词库新增「派生词(不同词性)」与「同义替换词」；左右侧栏支持手动收缩且点词自动唤醒右栏。</li>
-            <li><strong>v0.3（真人原声校准与 EXE 引导）：</strong>单词接入牛津/有道真人美音/英音录音；文章朗读引入英语母语白名单；压缩包新增原生 <code>.exe</code> 启动器与《开始上手指南》。</li>
-            <li><strong>v0.2（离线极速版与独立视口改造）：</strong>导航栏单行自适应；左中右三栏独立滚动互不干扰；内置英汉牛津/四六级离线词典（0ms 秒查，100% 断网可用）。</li>
-            <li><strong>v0.1（初始版本）：</strong>构建四六级同源外刊获取、五大高频题型标注、逐词翻译与三色行内标注、文章库自主筛选、长难句拆解与自测题核心框架。</li>
+          <strong>📜 版本迭代历史（最新在上）：</strong>
+          <ul class="space-y-2.5">
+            <li>
+              <strong>v2.0（当前版本 · 2026-11-01）：</strong>
+              <ul class="list-disc pl-5 space-y-0.5 mt-1">
+                <li>四个功能页面 UI 精简重构（精读 / 文章获取 / 单词库 / 时间统计）</li>
+                <li>专注阅读模式：进入精读页或切换文章自动收起两侧栏</li>
+                <li>朗读与阅读提速：边播边预取、快速失败、音频缓存</li>
+                <li>新增「安徽专升本英语」全链路支持</li>
+                <li>划词翻译、读下一篇闭环、文章库三联筛选、清词快捷键 0</li>
+                <li>UI 文字可选中复制；抓取失败明确提示</li>
+              </ul>
+            </li>
+            <li>
+              <strong>v1（桌面应用化基线）：</strong>
+              <ul class="list-disc pl-5 space-y-0.5 mt-1">
+                <li>单文件网页重构为独立 EXE（Vue 3 + FastAPI + SQLite）</li>
+                <li>数据迁入本地数据库；接入真 RSS 外刊抓取</li>
+                <li>设置持久化；界面与功能完整保留</li>
+              </ul>
+            </li>
+            <li>
+              <strong>更早版本（原单文件网页）：</strong>
+              <ul class="list-disc pl-5 space-y-0.5 mt-1">
+                <li><strong>旧版 v1.1：</strong>首页蓝宝石星环倒计时与星云背景升级</li>
+                <li><strong>旧版 v1.0：</strong>流光圆环倒计时重构</li>
+                <li><strong>旧版 v0.9：</strong>星空粒子背景；单一巨型刻度时钟</li>
+                <li><strong>旧版 v0.8：</strong>首页聚焦倒计时；统计数据一键清零</li>
+                <li><strong>旧版 v0.7：</strong>新增首页与时间统计页（热力图 / 趋势图）</li>
+                <li><strong>旧版 v0.6：</strong>三主题全量适配；点空白取消选词</li>
+                <li><strong>旧版 v0.5：</strong>正式定名 ReadFlow</li>
+                <li><strong>旧版 v0.4：</strong>自定义限时；情感朗读；派生词与同义词</li>
+                <li><strong>旧版 v0.3：</strong>真人词典原声；EXE 启动器</li>
+                <li><strong>旧版 v0.2：</strong>三栏独立滚动；内置离线词典</li>
+                <li><strong>旧版 v0.1：</strong>首个版本：外刊获取、逐词翻译、三色标注</li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
