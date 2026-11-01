@@ -96,6 +96,9 @@ export function applySidebarCollapseLayout() {
   if (leftPane) leftPane.classList.toggle('hidden', s.leftCollapsed)
   if (rightPane) rightPane.classList.toggle('hidden', s.rightCollapsed)
 
+  // Immersive mode widens the reading measure (76ch → 88ch) via a body class.
+  document.body.classList.toggle('reader-immersive', s.leftCollapsed && s.rightCollapsed)
+
   if (btnLeft) {
     btnLeft.textContent = s.leftCollapsed ? '▶ 展开左栏' : '◀ 收起左栏'
     btnLeft.className = s.leftCollapsed

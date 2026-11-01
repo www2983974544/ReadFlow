@@ -190,6 +190,17 @@ def _checks() -> None:
     js("select.filled", "document.getElementById('inputFreeTranslate').value.length > 30")
     js("select.output", "document.getElementById('outputFreeTranslate').textContent.length > 10")
 
+    # --- immersive measure widening (76ch ↔ 88ch) ---
+    js("immersive.normalWidth", "Math.round(document.querySelector('.reader-body-inner').getBoundingClientRect().width)+';'")
+    js("immersive.toggle", "document.getElementById('btnImmersiveBothPanes').click()")
+    time.sleep(0.2)
+    js("immersive.bodyClass", "document.body.className.includes('reader-immersive')")
+    js("immersive.wideWidth", "Math.round(document.querySelector('.reader-body-inner').getBoundingClientRect().width)+';'")
+    js("immersive.noOverlap", "(()=>{const c=document.getElementById('centerReaderPane').getBoundingClientRect();const b=document.querySelector('.reader-body-inner').getBoundingClientRect();return (b.right<=c.right+1&&b.left>=c.left-1)+';';})()")
+    js("immersive.restore", "document.getElementById('btnImmersiveBothPanes').click()")
+    time.sleep(0.2)
+    js("immersive.normalAgain", "Math.round(document.querySelector('.reader-body-inner').getBoundingClientRect().width)+';'")
+
     # --- cosmos pause switch ---
     js("cosmos.pausedOnReader", "window.__cosmosPaused === true")
     js("cosmos.navHome", "document.getElementById('navTabHome').click()")
