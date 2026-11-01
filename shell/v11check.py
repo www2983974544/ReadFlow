@@ -211,6 +211,63 @@ def _checks() -> None:
     time.sleep(0.3)
     js("cosmos.resumedOnHome", "window.__cosmosPaused === false")
 
+    # --- crawler page: compact bar, filters, real crawl flow ---
+    js("nav crawler", "document.getElementById('navTabCrawler').click()")
+    time.sleep(0.5)
+    visible("viewCrawler")
+    js("crawler.noImage", "document.querySelectorAll('#viewCrawler img').length")
+    js(
+        "crawler.barHeight",
+        "Math.round(document.querySelector('#viewCrawler .surface-card').getBoundingClientRect().height)+';'",
+    )
+    js("crawler.logDrawerCollapsed", "!document.querySelector('.crawl-log-drawer').open")
+    js(
+        "crawler.logOpenShows",
+        "document.querySelector('.crawl-log-drawer').open = true, document.getElementById('crawlerTerminalOutput').offsetHeight > 10",
+    )
+    js("crawler.logDrawerReclose", "document.querySelector('.crawl-log-drawer').open = false, true")
+    js("crawler.cards", "document.querySelectorAll('#crawlerDiscoveryGrid .crawl-card').length")
+    js(
+        "crawler.filterCET6",
+        "(()=>{const s=document.getElementById('crawlTargetLevel');s.value='CET-6';s.dispatchEvent(new Event('change'));"
+        "const cards=[...document.querySelectorAll('#crawlerDiscoveryGrid .crawl-card')];"
+        "return (cards.length>0 && cards.every(c=>c.textContent.includes('CET-6')))+';';})()",
+    )
+    js(
+        "crawler.filterEmpty",
+        "(()=>{const lvl=document.getElementById('crawlTargetLevel');lvl.value='CET-4';lvl.dispatchEvent(new Event('change'));"
+        "const cat=document.getElementById('crawlTargetCategory');cat.value='科技与人工智能';cat.dispatchEvent(new Event('change'));"
+        "return document.getElementById('crawlerDiscoveryGrid').textContent.includes('没有符合当前筛选条件')+';';})()",
+    )
+    js(
+        "crawler.filterReset",
+        "(()=>{const lvl=document.getElementById('crawlTargetLevel');lvl.value='all';lvl.dispatchEvent(new Event('change'));"
+        "const cat=document.getElementById('crawlTargetCategory');cat.value='all';cat.dispatchEvent(new Event('change'));"
+        "return document.querySelectorAll('#crawlerDiscoveryGrid .crawl-card').length+';';})()",
+    )
+    js(
+        "crawler.scrollWorks",
+        "(()=>{const e=document.getElementById('viewCrawler');e.scrollTop=200;return e.scrollTop+';';})()",
+    )
+    js("crawl click", "document.getElementById('btnStartCrawlBatch').click()")
+    time.sleep(1)
+    js("crawler.btnDisabledDuringCrawl", "document.getElementById('btnStartCrawlBatch').disabled")
+    time.sleep(26)  # real RSS fetch (12s server deadline) + fallbacks + store sync
+    js("crawler.btnRestored", "!document.getElementById('btnStartCrawlBatch').disabled")
+    js("crawler.cardsAfter", "document.querySelectorAll('#crawlerDiscoveryGrid .crawl-card').length")
+    js("crawler.logLast", "[...document.getElementById('crawlerTerminalOutput').children].pop().textContent")
+    js("crawler.cardClickNav", "document.querySelector('#crawlerDiscoveryGrid .crawl-card').click(), 'ok;'")
+    time.sleep(0.4)
+    js("crawler.cardNavReaderActive", "document.getElementById('navTabReader').className.includes('nav-active')")
+
+    # --- custom import modal (restyled in App.vue) opens and closes ---
+    js("modal.open", "document.getElementById('btnOpenCustomImport').click()")
+    time.sleep(0.2)
+    js("modal.visible", "!document.getElementById('modalCustomImport').classList.contains('hidden')")
+    js("modal.close", "document.getElementById('btnCancelCustomModal').click()")
+    time.sleep(0.2)
+    js("modal.closedAgain", "document.getElementById('modalCustomImport').classList.contains('hidden')")
+
 
 def main() -> None:
     global WINDOW

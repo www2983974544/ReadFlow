@@ -166,7 +166,7 @@ onMounted(async () => {
 
   <!-- MODAL 1: CUSTOM ARTICLE IMPORT -->
   <div id="modalCustomImport" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" :class="{ hidden: !ui.customImportOpen }">
-    <div class="surface-card max-w-2xl w-full p-6 shadow-2xl space-y-4">
+    <div class="surface-card max-w-xl w-full p-6 rounded-2xl shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-200 pb-3">
         <h3 class="text-base font-bold">📋 导入或解析自定义英文文章 (支持纯离线分词 & 牛津词库打标)</h3>
         <button id="btnCloseCustomModal" type="button" class="text-slate-400 hover:text-slate-700 text-lg font-bold" @click="ui.customImportOpen = false">✕</button>

@@ -29,34 +29,44 @@ export function renderCrawlerDiscoveryGrid() {
     return true
   })
 
+  if (list.length === 0) {
+    grid.innerHTML = `
+          <div class="col-span-full surface-card border border-dashed p-10 text-center space-y-2">
+            <div class="text-3xl">🗞️</div>
+            <h3 class="text-base font-bold">没有符合当前筛选条件的文章</h3>
+            <p class="text-xs opacity-70 max-w-md mx-auto">试试切换难度、题型或刊物源筛选，或点击上方「🚀 立即抓取同源外刊」扩充候选池。</p>
+          </div>
+        `
+    return
+  }
+
   grid.innerHTML = list
     .map((art) => {
       const libBtnHtml = art.inLibrary
-        ? `<button type="button" data-artid="${art.id}" class="btn-card-toggle-lib px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-rose-50 hover:text-rose-700">✓ 已在文章库 (移出)</button>`
-        : `<button type="button" data-artid="${art.id}" class="btn-card-toggle-lib px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500">➕ 加入文章库</button>`
+        ? `<button type="button" data-artid="${art.id}" class="btn-card-toggle-lib px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition whitespace-nowrap">✓ 已入库 (移出)</button>`
+        : `<button type="button" data-artid="${art.id}" class="btn-card-toggle-lib px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition whitespace-nowrap">➕ 加入文章库</button>`
 
       return `
-          <div data-artid="${art.id}" class="crawl-card surface-card p-5 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition cursor-pointer">
-            <div class="space-y-2.5">
+          <div data-artid="${art.id}" class="crawl-card surface-card p-4 shadow-sm flex flex-col justify-between space-y-2.5 hover:shadow-md transition cursor-pointer">
+            <div class="space-y-1.5 min-w-0">
               <div class="flex items-center justify-between gap-2">
-                <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">${art.examLevel}</span>
-                <span class="text-xs font-semibold text-indigo-600">${art.category}</span>
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-[11px] font-bold tracking-wider uppercase text-indigo-600 truncate">${art.source}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white shrink-0">${art.examLevel}</span>
+                </div>
+                <span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 shrink-0 truncate max-w-[45%]">${art.category}</span>
               </div>
-              <div class="flex items-center gap-2 text-xs opacity-75">
-                <span>📰 来源: <strong>${art.source}</strong></span>
-                <span>·</span>
-                <span>考纲词 ${art.cetRatio}</span>
-              </div>
-              <h4 class="serif-article text-lg font-bold leading-snug">${art.title}</h4>
-              <p class="text-xs font-medium opacity-80">${art.titleCn}</p>
-              <p class="text-xs opacity-70 line-clamp-3 leading-relaxed">${art.paragraphs[0].en}</p>
+              <h4 class="serif-article text-base font-bold leading-snug line-clamp-2">${art.title}</h4>
+              <p class="text-xs opacity-75 line-clamp-1">${art.titleCn}</p>
+              <p class="text-xs opacity-60 line-clamp-2 leading-relaxed">${art.paragraphs[0].en}</p>
             </div>
 
-            <div class="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2">
-              <button type="button" data-artid="${art.id}" class="btn-card-open-read px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 hover:bg-slate-100 transition">
-                📖 进入逐词精读
-              </button>
-              ${libBtnHtml}
+            <div class="pt-2.5 flex items-center justify-between gap-2" style="border-top: 1px solid var(--border-col)">
+              <span class="text-[11px] opacity-60 truncate">考纲词 ${art.cetRatio} · ${art.lexile}</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" data-artid="${art.id}" class="btn-card-open-read px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 hover:bg-slate-100 transition whitespace-nowrap">📖 精读</button>
+                ${libBtnHtml}
+              </div>
             </div>
           </div>
         `
@@ -64,7 +74,20 @@ export function renderCrawlerDiscoveryGrid() {
     .join('')
 }
 
+let crawlRunning = false
+
 export async function runCrawlFlow() {
+  if (crawlRunning) return // real crawls take up to ~22s; block double-fires
+  crawlRunning = true
+  const crawlBtn = document.getElementById('btnStartCrawlBatch') as HTMLButtonElement | null
+  const setCrawlBtn = (text: string, disabled: boolean) => {
+    if (crawlBtn) {
+      crawlBtn.disabled = disabled
+      crawlBtn.textContent = text
+    }
+  }
+  setCrawlBtn('⏳ 抓取中…', true)
+
   const logBox = document.getElementById('crawlerTerminalOutput')
   const statusHint = document.getElementById('crawlerStatusHint')
   const appendLog = (txt: string) => {
@@ -75,11 +98,11 @@ export async function runCrawlFlow() {
     logBox.scrollTop = logBox.scrollHeight
   }
 
-  if (statusHint) statusHint.textContent = '正在执行同源题库检索与四六级词频匹配...'
-  appendLog('[CRAWL] 正在扫描四六级高频外刊源 (The Economist / Nature / The Atlantic / BBC)...')
-
-  const online = navigator.onLine
   try {
+    if (statusHint) statusHint.textContent = '正在执行同源题库检索与四六级词频匹配...'
+    appendLog('[CRAWL] 正在扫描四六级高频外刊源 (The Economist / Nature / The Atlantic / BBC)...')
+
+    const online = navigator.onLine
     const res = await apiPost<CrawlResponse>('/api/crawl', {})
     const addedCount = res.poolAdded.length + (res.live ? 1 : 0)
 
@@ -109,6 +132,9 @@ export async function runCrawlFlow() {
   } catch {
     appendLog('[OFFLINE-ENGINE] 已使用内置高分同源外刊库完成匹配。')
     if (statusHint) statusHint.textContent = '当前候选池已包含全部最新同源外刊，可直接挑选入库或点击「手动粘贴导入」。'
+  } finally {
+    crawlRunning = false
+    setCrawlBtn('🚀 立即抓取同源外刊', false)
   }
 }
 
