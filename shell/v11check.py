@@ -329,6 +329,25 @@ def _checks() -> None:
     js("vocab2.maskBtnText", "document.getElementById('btnToggleFlashcardMask').textContent.slice(0, 3)")
     js("vocab2.exportBtnPresent", "!!document.getElementById('btnExportVocabCsv')")
 
+    # --- library page: triple filter strip (same as crawler) ---
+    js("nav library", "document.getElementById('navTabLibrary').click()")
+    time.sleep(0.4)
+    visible("viewLibrary")
+    js("library.filterPresent", "!!document.getElementById('libTargetLevel')")
+    js("library.ahzsbOption", "[...document.getElementById('libTargetLevel').options].some(o=>o.value==='安徽专升本')")
+    js("library.cardsAll", "document.querySelectorAll('#myLibraryGrid .lib-card').length")
+    js(
+        "library.filterCET6",
+        "(()=>{const s=document.getElementById('libTargetLevel');s.value='CET-6';s.dispatchEvent(new Event('change'));"
+        "const cards=[...document.querySelectorAll('#myLibraryGrid .lib-card')];"
+        "return (cards.length>0 && cards.every(c=>c.textContent.includes('CET-6')))+';';})()",
+    )
+    js(
+        "library.filterReset",
+        "(()=>{const s=document.getElementById('libTargetLevel');s.value='all';s.dispatchEvent(new Event('change'));"
+        "return document.querySelectorAll('#myLibraryGrid .lib-card').length+';';})()",
+    )
+
     # --- stats page: monochrome numerals + segmented hm slot + ghost reset ---
     js("nav stats", "document.getElementById('navTabStats').click()")
     time.sleep(0.4)

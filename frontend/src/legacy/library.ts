@@ -13,10 +13,17 @@ export function renderMyLibraryGrid() {
     .trim()
     .toLowerCase()
   const statusFilter = (document.getElementById('selectLibraryStatusFilter') as HTMLSelectElement | null)?.value || 'all'
+  // Triple filter strip (identical to the crawler page, default: show all)
+  const targetLevel = (document.getElementById('libTargetLevel') as HTMLSelectElement | null)?.value || 'all'
+  const targetCat = (document.getElementById('libTargetCategory') as HTMLSelectElement | null)?.value || 'all'
+  const targetSrc = (document.getElementById('libTargetSource') as HTMLSelectElement | null)?.value || 'all'
 
   const list = s.articles.filter((a) => {
     if (!a.inLibrary) return false
     if (statusFilter !== 'all' && a.readStatus !== statusFilter) return false
+    if (targetLevel !== 'all' && a.examLevel !== targetLevel) return false
+    if (targetCat !== 'all' && a.category !== targetCat) return false
+    if (targetSrc !== 'all' && targetSrc !== 'Live Web Feed' && !a.source.includes(targetSrc.split(' ')[0])) return false
     if (
       query &&
       !(
@@ -104,6 +111,9 @@ export function initLibraryView() {
   document.getElementById('inputSearchLibrary')?.addEventListener('input', renderMyLibraryGrid)
   document.getElementById('selectLibraryStatusFilter')?.addEventListener('change', renderMyLibraryGrid)
   document.getElementById('btnExportLibraryJson')?.addEventListener('click', exportLibraryJson)
+  document.getElementById('libTargetLevel')?.addEventListener('change', renderMyLibraryGrid)
+  document.getElementById('libTargetCategory')?.addEventListener('change', renderMyLibraryGrid)
+  document.getElementById('libTargetSource')?.addEventListener('change', renderMyLibraryGrid)
 
   document.getElementById('myLibraryGrid')?.addEventListener('click', async (e) => {
     const target = e.target as HTMLElement

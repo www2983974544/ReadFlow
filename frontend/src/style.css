@@ -1115,7 +1115,8 @@
     /* ==========================================================================
        v1.1 CRAWLER UI REFACTOR — scoped to #viewCrawler
        ========================================================================== */
-    #viewCrawler .crawl-filter-select {
+    #viewCrawler .crawl-filter-select,
+    #viewLibrary .crawl-filter-select {
       height: 32px;
       font-size: 12px;
       border-radius: 8px;
@@ -1127,7 +1128,8 @@
       max-width: 250px;
       cursor: pointer;
     }
-    #viewCrawler .crawl-filter-select:focus {
+    #viewCrawler .crawl-filter-select:focus,
+    #viewLibrary .crawl-filter-select:focus {
       border-color: #818cf8;
     }
     #viewCrawler .crawl-log-drawer summary {
