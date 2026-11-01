@@ -234,7 +234,14 @@ onMounted(async () => {
           <strong>📜 版本迭代历史（最新在上）：</strong>
           <ul class="space-y-2.5">
             <li>
-              <strong>v2.0（当前版本 · 2026-11-01）：</strong>
+              <strong>v2.1（当前版本 · 2026-11-01）：</strong>
+              <ul class="list-disc pl-5 space-y-0.5 mt-1">
+                <li>左上角版本徽章与 ❓ 更新记录弹窗随版本号同步显示</li>
+                <li>更新记录弹窗重写为分层无序列表精简版</li>
+              </ul>
+            </li>
+            <li>
+              <strong>v2.0（2026-11-01）：</strong>
               <ul class="list-disc pl-5 space-y-0.5 mt-1">
                 <li>四个功能页面 UI 精简重构（精读 / 文章获取 / 单词库 / 时间统计）</li>
                 <li>专注阅读模式：进入精读页或切换文章自动收起两侧栏</li>
