@@ -1,13 +1,20 @@
 // Ported UI helper functions (toast, badges, theme, sidebar collapse, stats delta).
 import { S } from './state'
 import { useStatsStore } from '../stores/stats'
+import { useUiStore } from '../stores/ui'
 
-// P4 view renderers register themselves here so P2 functions can call them
+// Stats view renderers register themselves here so P2 functions can call them
 // before the stats/crawler/library views are ported.
 export const hooks: {
   renderStatsAndHeatmap: () => void
 } = {
   renderStatsAndHeatmap: () => {},
+}
+
+// Rendering the 364-cell heatmap on a hidden page is wasted work — the stats
+// view re-renders anyway when its tab is opened.
+export function renderStatsIfVisible() {
+  if (useUiStore().activeView === 'stats') hooks.renderStatsAndHeatmap()
 }
 
 export function showToast(msg: string) {
@@ -138,5 +145,5 @@ export async function recordTodayStudyDelta(
     Math.max(0, (today.words || 0) + deltaWords) - (today.words || 0),
     syncVocabTotal === null ? 0 : vocabDelta,
   )
-  hooks.renderStatsAndHeatmap()
+  renderStatsIfVisible()
 }

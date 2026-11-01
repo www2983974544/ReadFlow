@@ -3,7 +3,7 @@ import { onMounted } from 'vue'
 import { S } from '../legacy/state'
 import {
   applySidebarCollapseLayout,
-  hooks,
+  renderStatsIfVisible,
   showToast,
   updateTopBadgesAndStats,
 } from '../legacy/ui-fns'
@@ -185,7 +185,7 @@ onMounted(() => {
       }
     }
     updateTopBadgesAndStats()
-    hooks.renderStatsAndHeatmap()
+    renderStatsIfVisible()
   })
 
   // Delegated listener for Marked Words in Current Article
@@ -388,7 +388,7 @@ onMounted(() => {
 
     <!-- Center Pane: Interactive Article Reader -->
     <div id="centerReaderPane" class="center-reader-box independent-scroll-pane space-y-3 px-0.5">
-      <div class="surface-card reader-toolbar-card shadow-sm sticky top-0 z-10 backdrop-blur-md">
+      <div class="surface-card reader-toolbar-card shadow-sm sticky top-0 z-10">
         <div class="toolbar-row-top">
           <button id="btnToggleLeftPane" type="button" title="展开/收起左侧文章目录栏" class="toolbar-pill-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200">
             ◀ 左栏

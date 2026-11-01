@@ -392,9 +392,14 @@ export async function markCurrentWord(statusType: WordMark['status']) {
     context: s.activeContextSentence,
     articleTitle: art ? art.title : 'CET Reading Passage',
   }
-  await useVocabStore().mark(mark)
 
-  await recordTodayStudyDelta(0, 0, Object.keys(s.wordMarks).length)
+  // The two local requests are independent (the stats delta uses the post-mark
+  // count computed here), so run them in parallel instead of serially.
+  const countAfter = Object.keys(s.wordMarks).length + (s.wordMarks[lemma] ? 0 : 1)
+  await Promise.all([
+    useVocabStore().mark(mark),
+    recordTodayStudyDelta(0, 0, countAfter),
+  ])
   updateTopBadgesAndStats()
   updateWordTokensInPlace(lemma)
   renderArticleMarkedWordsList()
