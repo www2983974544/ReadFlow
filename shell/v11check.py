@@ -105,6 +105,7 @@ def _checks() -> None:
     # --- drawers/details default collapsed ---
     js("details.collapsed", "[...document.querySelectorAll('#mainArticleSurface details')].map(d=>!d.open).join(',')")
     js("filterDrawer.collapsed", "!document.querySelector('.reader-filter-drawer').open")
+    js("levelChip.ahzsb", "!!document.querySelector('.level-chip[data-level=\"安徽专升本\"]')")
 
     # --- masthead strings ---
     js("eyebrow.source", "document.getElementById('readerBadgeSource').textContent")
@@ -279,6 +280,7 @@ def _checks() -> None:
         "crawler.scrollWorks",
         "(()=>{const e=document.getElementById('viewCrawler');e.scrollTop=200;return e.scrollTop+';';})()",
     )
+    js("crawler.setLevelTag", "document.getElementById('crawlTargetLevel').value='安徽专升本', 'ok;'")
     js("crawl click", "document.getElementById('btnStartCrawlBatch').click()")
     time.sleep(1)
     js("crawler.btnDisabledDuringCrawl", "document.getElementById('btnStartCrawlBatch').disabled")
@@ -286,6 +288,12 @@ def _checks() -> None:
     js("crawler.btnRestored", "!document.getElementById('btnStartCrawlBatch').disabled")
     js("crawler.cardsAfter", "document.querySelectorAll('#crawlerDiscoveryGrid .crawl-card').length")
     js("crawler.logLast", "[...document.getElementById('crawlerTerminalOutput').children].pop().textContent")
+    js(
+        "crawler.levelTagged",
+        "(()=>{return (document.getElementById('crawlerDiscoveryGrid').textContent.includes('安徽专升本') || "
+        "[...document.getElementById('crawlerTerminalOutput').children].pop().textContent.includes('OFFLINE'))+';';})()",
+    )
+    js("crawler.levelReset", "document.getElementById('crawlTargetLevel').value='all', document.getElementById('crawlTargetLevel').dispatchEvent(new Event('change')), 'ok;'")
     js("crawler.cardClickNav", "document.querySelector('#crawlerDiscoveryGrid .crawl-card').click(), 'ok;'")
     time.sleep(0.4)
     js("crawler.cardNavReaderActive", "document.getElementById('navTabReader').className.includes('nav-active')")
@@ -297,6 +305,10 @@ def _checks() -> None:
     js("modal.close", "document.getElementById('btnCancelCustomModal').click()")
     time.sleep(0.2)
     js("modal.closedAgain", "document.getElementById('modalCustomImport').classList.contains('hidden')")
+
+    # --- 安徽专升本 level support ---
+    js("modal.levelSelect", "!!document.getElementById('customInputLevel')")
+    js("crawler.levelOption", "[...document.getElementById('crawlTargetLevel').options].some(o=>o.value==='安徽专升本')")
 
 
 def main() -> None:

@@ -103,7 +103,8 @@ export async function runCrawlFlow() {
     appendLog('[CRAWL] 正在扫描四六级高频外刊源 (The Economist / Nature / The Atlantic / BBC)...')
 
     const online = navigator.onLine
-    const res = await apiPost<CrawlResponse>('/api/crawl', {})
+    const targetLevel = (document.getElementById('crawlTargetLevel') as HTMLSelectElement | null)?.value || 'all'
+    const res = await apiPost<CrawlResponse>('/api/crawl', { level: targetLevel })
     const addedCount = res.poolAdded.length + (res.live ? 1 : 0)
 
     for (const a of res.poolAdded) {

@@ -360,6 +360,7 @@ onMounted(() => {
                 <button data-level="all" type="button" class="level-chip px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white">全部难度</button>
                 <button data-level="CET-4" type="button" class="level-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">四级 CET-4</button>
                 <button data-level="CET-6" type="button" class="level-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">六级 CET-6</button>
+                <button data-level="安徽专升本" type="button" class="level-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">安徽专升本</button>
               </div>
               <div>
                 <label for="selectCategoryFilter" class="block text-[11px] font-medium opacity-70 mb-1">四六级高频题型分类：</label>

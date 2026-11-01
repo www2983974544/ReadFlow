@@ -51,6 +51,7 @@ watch(
             <option value="all">智能混排 (CET-4 &amp; CET-6)</option>
             <option value="CET-4">大学英语四级 (250-350词 · 蓝思 950L)</option>
             <option value="CET-6">大学英语六级 (350-480词 · 蓝思 1150L)</option>
+            <option value="安徽专升本">安徽专升本英语 (300-450词 · 蓝思 900L)</option>
           </select>
         </label>
         <label class="flex items-center gap-1.5 text-xs opacity-70 whitespace-nowrap">题型
