@@ -279,10 +279,11 @@ async function submitCustomArticle() {
           </ul>
         </div>
         <div class="guide-box">
-          <strong>📜 Android 版迭代历史</strong>
+          <strong>📜 Android 版更新记录 (CHANGELOG)</strong>
           <ul>
-            <li><strong>v1.0（当前 · Android 版首发）：</strong>以桌面 V2.1 功能集为基准的移动版：底部标签栏 + 精读页目录抽屉/三 Tab 查词台弹层 + 专注阅读模式 + 客户端真 RSS 爬虫（Readability 提取、Wikipedia 兜底）+ 有道真人朗读与系统 TTS 兜底 + 导出分享面板 + 返回键逐级导航。</li>
-            <li><strong>功能基线（桌面版迭代史）：</strong>桌面 v2.1（版本标识单一来源）、v2.0（精读页杂志化/获取页重构/提速专项/安徽专升本链路）、v1.x（同源外刊获取、逐词点查三色标注、牛津离线词典、全模块）。</li>
+            <li><strong>v1.1（当前）：</strong>六项体验提升——计时防锁屏、深色跟随系统（🌗 档）、查词台快捷标注条、划词翻译气泡、抓取源健康度与单源重试、每日学习提醒。</li>
+            <li><strong>v1.0（首发）：</strong>以桌面 V2.1 功能集为基准的移动版——底部标签栏六视图；精读页目录抽屉 + 三 Tab 查词台弹层 + 专注阅读模式；客户端真 RSS 爬虫（Readability 提取、Wikipedia 兜底、12 秒时限）；有道真人朗读 + 系统 TTS 兜底；导出走系统分享面板；返回键逐级导航；三主题与设置持久化；安徽专升本全链路；文章库三联筛选；单词库闪卡；统计热力图与跨实体清零守卫。</li>
+            <li><strong>功能基线：</strong>桌面版 v2.x 迭代史见桌面端《ReadFlow_版本更新日志(CHANGELOG)》。</li>
           </ul>
         </div>
       </div>
