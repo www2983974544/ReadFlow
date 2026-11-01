@@ -10,7 +10,9 @@ import {
 import {
   clearActiveWordSelection,
   clearWordMark,
+  goNextArticle,
   markCurrentWord,
+  recordQuizAnswered,
   renderCurrentArticle,
   renderSidebarArticleList,
   saveWordNote,
@@ -19,6 +21,7 @@ import {
   toggleArticleLibraryStatus,
   updateWordTokensInPlace,
 } from '../legacy/reader'
+import { switchInspectorTab } from '../legacy/inspector-tabs'
 import { initInspectorTabs } from '../legacy/inspector-tabs'
 import { applyCustomTimerMinutes, resetExamTimer, toggleExamTimer } from '../legacy/timer'
 import { translateSentenceOfflineOrOnline } from '../legacy/translate'
@@ -95,8 +98,25 @@ onMounted(() => {
     if (!card) return
     s.currentArticleId = card.getAttribute('data-artid') || ''
     renderSidebarArticleList()
-    renderCurrentArticle()
+    renderCurrentArticle({ resetInspector: true })
     el('centerReaderPane')!.scrollTop = 0
+  })
+
+  // Selection → instant translate (drag-select ≥2 words fills the translator tab)
+  el('centerReaderPane')?.addEventListener('mouseup', () => {
+    setTimeout(() => {
+      const text = (window.getSelection()?.toString() || '').trim()
+      const words = text.split(/\s+/).filter(Boolean)
+      if (words.length < 2 || text.length > 600) return
+      const ta = el<HTMLTextAreaElement>('inputFreeTranslate')
+      if (ta) ta.value = text
+      if (s.rightCollapsed) {
+        s.rightCollapsed = false
+        applySidebarCollapseLayout()
+      }
+      switchInspectorTab('trans')
+      void translateSentenceOfflineOrOnline(text)
+    }, 0)
   })
 
   // Delegated Click Listener for Article Words, Paragraph Controls & Blank Space Deselection
@@ -147,6 +167,7 @@ onMounted(() => {
     const qItem = art.quiz[qIdx]
     const expBox = document.getElementById('quizExp-' + qIdx)
     await useStatsStore().answerQuiz(art.id, qIdx, oIdx, oIdx === qItem.answer)
+    recordQuizAnswered(art.id, qIdx)
 
     if (oIdx === qItem.answer) {
       btn.className =
@@ -262,6 +283,7 @@ onMounted(() => {
   })
 
   el('btnMarkArticleFinished')?.addEventListener('click', toggleArticleFinished)
+  el('btnNextArticle')?.addEventListener('click', () => void goNextArticle())
 
   el('btnSpeakWord')?.addEventListener('click', () => speakSingleWord(s.activeWord))
   el('btnSpeakWordUS')?.addEventListener('click', () => speakSingleWord(s.activeWord, 'US'))
@@ -352,9 +374,9 @@ onMounted(() => {
 
       <!-- Pinned minimal stat strip -->
       <div class="reader-stat-strip surface-card mt-2 px-3 flex items-center justify-between text-[11px]" style="min-height: 34px">
-        <span title="文章库藏量">📚 <span id="statLibraryTotal" class="font-bold text-indigo-600">3</span></span>
-        <span title="单词库收录">🔖 <span id="statMarkedWords" class="font-bold text-rose-500">0</span></span>
-        <span title="已完成精读">✅ <span id="statFinishedArticles" class="font-bold text-emerald-600">0</span></span>
+        <span title="文章库藏量">📚 <span id="statLibraryTotal" class="font-bold text-indigo-600">3</span><span class="opacity-60 ml-0.5">篇</span></span>
+        <span title="单词库收录">🔖 <span id="statMarkedWords" class="font-bold text-rose-500">0</span><span class="opacity-60 ml-0.5">词</span></span>
+        <span title="已完成精读">✅ <span id="statFinishedArticles" class="font-bold text-emerald-600">0</span><span class="opacity-60 ml-0.5">篇</span></span>
         <span title="模考训练正确率">🎯 <span id="statQuizAccuracy" class="font-bold text-amber-600">0%</span></span>
       </div>
     </aside>
@@ -432,8 +454,9 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Main Article Canvas: Editorial Masthead + Body -->
+      <!-- Main Article Canvas: Editorial Masthead + Body (single 76ch axis) -->
       <article id="mainArticleSurface" class="reader-surface p-5 sm:p-7 shadow-sm">
+        <div class="reader-body-inner">
         <div class="reader-masthead pb-4 mb-5">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div class="reader-eyebrow flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px]" style="color: var(--text-muted)">
@@ -478,22 +501,30 @@ onMounted(() => {
               <button id="btnMarkArticleFinished" type="button" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-sm">
                 ✓ 标记本文已精读完成
               </button>
+              <button id="btnNextArticle" type="button" class="hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 transition shadow-sm">
+                读下一篇 →
+              </button>
             </div>
           </div>
 
-          <details class="reader-details mb-2.5">
+          <details id="sentenceDetails" class="reader-details mb-2.5">
             <summary>🔍 本篇核心长难句语法拆解</summary>
             <div class="details-body">
               <div id="readerSentenceAnalysis" class="rounded-xl space-y-1.5 text-xs sm:text-sm"></div>
             </div>
           </details>
 
-          <details class="reader-details">
-            <summary>🎯 四六级仿真阅读理解自测 (仔细阅读专项)</summary>
+          <details id="quizDetails" class="reader-details">
+            <summary>
+              <span id="quizUnansweredDot" class="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 mr-1.5"></span>
+              🎯 四六级仿真阅读理解自测 (仔细阅读专项)
+              <span id="quizSummaryMeta" class="font-normal opacity-60 ml-1 text-[11px]"></span>
+            </summary>
             <div class="details-body">
               <div id="readerQuizContainer" class="space-y-3.5"></div>
             </div>
           </details>
+        </div>
         </div>
       </article>
     </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import ReaderView from './components/ReaderView.vue'
 import HomeView from './components/views/HomeView.vue'
@@ -7,6 +7,7 @@ import CrawlerView from './components/views/CrawlerView.vue'
 import LibraryView from './components/views/LibraryView.vue'
 import VocabView from './components/views/VocabView.vue'
 import StatsView from './components/views/StatsView.vue'
+import { setCosmosPaused } from './legacy/cosmos'
 import { S, hydrateExamSettings } from './legacy/state'
 import { applySidebarCollapseLayout, applyThemeMode, showToast, updateTopBadgesAndStats } from './legacy/ui-fns'
 import {
@@ -126,6 +127,15 @@ onMounted(async () => {
     else if (e.key.toLowerCase() === 's') speakSingleWord(S().activeWord)
     else if (e.key.toLowerCase() === 'b') document.getElementById('btnToggleBilingual')?.click()
   })
+
+  // Pause the home cosmos canvas while other views are shown (CPU/battery).
+  setCosmosPaused(ui.activeView !== 'home')
+  watch(
+    () => ui.activeView,
+    (view) => {
+      setCosmosPaused(view !== 'home')
+    },
+  )
 })
 </script>
 

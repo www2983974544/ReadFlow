@@ -985,7 +985,7 @@
     #viewReader .reader-meta-line {
       color: var(--text-muted);
     }
-    #viewReader .reader-body {
+    #viewReader .reader-body-inner {
       max-width: 76ch;
       margin-inline: auto;
     }

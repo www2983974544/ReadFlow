@@ -112,7 +112,7 @@ export function initLibraryView() {
       s.currentArticleId = openBtn.getAttribute('data-artid') || ''
       ui.switchView('reader')
       renderSidebarArticleList()
-      renderCurrentArticle()
+      renderCurrentArticle({ resetInspector: true })
       return
     }
     const toggleFinBtn = target.closest('.btn-lib-toggle-fin') as HTMLElement | null
@@ -164,7 +164,7 @@ export function initLibraryView() {
       s.currentArticleId = card.getAttribute('data-artid') || ''
       ui.switchView('reader')
       renderSidebarArticleList()
-      renderCurrentArticle()
+      renderCurrentArticle({ resetInspector: true })
     }
   })
 }

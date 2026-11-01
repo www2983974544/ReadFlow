@@ -219,6 +219,40 @@ export function playExpressiveOfflineProsodyTTS(
   })
 }
 
+// Per-sentence expressive parameters for the edge-tts neural narration
+// (mirrors the legacy offline prosody rules in playExpressiveOfflineProsodyTTS).
+function expressiveParams(sentences: string[], idx: number, baseRate: number): { rate: string; pitch: string } {
+  const total = sentences.length
+  const sent = sentences[idx] || ''
+  const isContrast = /^(However|Yet|Paradoxically|Instead|Consequently|In response|Beyond|While)\b/i.test(sent)
+  let effRate = baseRate
+  let pitchHz = 0
+  if (isContrast) {
+    effRate = Math.max(0.75, baseRate * 0.96)
+    pitchHz = 8
+  } else if (idx === 0) {
+    pitchHz = 4
+  } else if (idx === total - 1 && total > 1) {
+    effRate = Math.max(0.75, baseRate * 0.95)
+    pitchHz = -6
+  } else {
+    pitchHz = idx % 2 === 1 ? 2 : -2
+  }
+  const ratePct = Math.round((effRate - 1) * 100)
+  return {
+    rate: `${ratePct >= 0 ? '+' : ''}${ratePct}%`,
+    pitch: `${pitchHz >= 0 ? '+' : ''}${pitchHz}Hz`,
+  }
+}
+
+function edgeVoiceFor(accent: string): string {
+  return accent === 'UK' ? 'en-GB-SoniaNeural' : 'en-US-AriaNeural'
+}
+
+function edgeTtsUrl(text: string, voice: string, rate: string, pitch: string): string {
+  return `/api/tts?text=${encodeURIComponent(text)}&voice=${encodeURIComponent(voice)}&rate=${encodeURIComponent(rate)}&pitch=${encodeURIComponent(pitch)}`
+}
+
 export function speakPassageBroadcast(text: string, isFullArticleBtn = false, highlightParaIdx: number | null = null) {
   if (isFullArticleBtn && isSpeakingFull) {
     stopSpeechPlayback()
@@ -248,64 +282,110 @@ export function speakPassageBroadcast(text: string, isFullArticleBtn = false, hi
   const typeNum = accent === 'UK' ? 1 : 2
 
   if (navigator.onLine) {
-    const buildAudioForChunk = (chunkText: string) => {
-      const a = new Audio(`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(chunkText)}&le=eng&type=${typeNum}`)
-      a.preload = 'auto'
-      a.playbackRate = rate
-      if ('preservesPitch' in a) (a as HTMLAudioElement & { preservesPitch: boolean }).preservesPitch = true
-      return a
+    const finishFull = () => {
+      isSpeakingFull = false
+      const btnFull = document.getElementById('btnReadFullArticle')
+      if (btnFull) btnFull.textContent = '🔊 全文朗读'
+      document.querySelectorAll('.speaking-para-highlight').forEach((el) => el.classList.remove('speaking-para-highlight'))
     }
 
-    let currentIdx = 0
-    let nextPreloadedAudio: HTMLAudioElement | null = sentences.length > 1 ? buildAudioForChunk(sentences[1]) : null
-
-    const playNextChunk = () => {
+    // Fallback chain level 2: Youdao dictionary audio queue (uniform tone).
+    const playYoudaoFrom = (fromIdx: number) => {
       if (broadcastSessionId !== mySession) return
-      if (currentIdx >= sentences.length) {
-        isSpeakingFull = false
-        const btnFull = document.getElementById('btnReadFullArticle')
-        if (btnFull) btnFull.textContent = '🔊 全文朗读'
-        document.querySelectorAll('.speaking-para-highlight').forEach((el) => el.classList.remove('speaking-para-highlight'))
+      if (fromIdx >= sentences.length) {
+        finishFull()
         return
       }
-
-      const audio =
-        currentIdx === 0
-          ? buildAudioForChunk(sentences[0])
-          : nextPreloadedAudio || buildAudioForChunk(sentences[currentIdx])
-
-      if (currentIdx + 1 < sentences.length) {
-        nextPreloadedAudio = buildAudioForChunk(sentences[currentIdx + 1])
-      } else {
-        nextPreloadedAudio = null
+      const buildAudioForChunk = (chunkText: string) => {
+        const a = new Audio(`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(chunkText)}&le=eng&type=${typeNum}`)
+        a.preload = 'auto'
+        a.playbackRate = rate
+        if ('preservesPitch' in a) (a as HTMLAudioElement & { preservesPitch: boolean }).preservesPitch = true
+        return a
       }
 
+      let currentIdx = fromIdx
+      let nextPreloadedAudio: HTMLAudioElement | null =
+        currentIdx + 1 < sentences.length ? buildAudioForChunk(sentences[currentIdx + 1]) : null
+
+      const playNextChunk = () => {
+        if (broadcastSessionId !== mySession) return
+        if (currentIdx >= sentences.length) {
+          finishFull()
+          return
+        }
+
+        const audio =
+          currentIdx === fromIdx
+            ? buildAudioForChunk(sentences[currentIdx])
+            : nextPreloadedAudio || buildAudioForChunk(sentences[currentIdx])
+
+        if (currentIdx + 1 < sentences.length) {
+          nextPreloadedAudio = buildAudioForChunk(sentences[currentIdx + 1])
+        } else {
+          nextPreloadedAudio = null
+        }
+
+        currentPlayingAudio = audio
+        audio.playbackRate = rate
+
+        audio.onended = () => {
+          if (broadcastSessionId !== mySession) return
+          currentIdx++
+          setTimeout(() => {
+            if (broadcastSessionId === mySession) playNextChunk()
+          }, 180)
+        }
+
+        audio.onerror = () => {
+          if (broadcastSessionId !== mySession) return
+          playExpressiveOfflineProsodyTTS(sentences.slice(currentIdx), mySession, accent, rate)
+        }
+
+        const playProm = audio.play()
+        if (playProm !== undefined) {
+          playProm.catch(() => {
+            if (broadcastSessionId !== mySession) return
+            playExpressiveOfflineProsodyTTS(sentences.slice(currentIdx), mySession, accent, rate)
+          })
+        }
+      }
+
+      playNextChunk()
+    }
+
+    // Preferred chain: edge-tts neural narration with per-sentence emotion,
+    // falling back to the Youdao queue on any failure.
+    const playEdgeFrom = (fromIdx: number) => {
+      if (broadcastSessionId !== mySession) return
+      if (fromIdx >= sentences.length) {
+        finishFull()
+        return
+      }
+      const params = expressiveParams(sentences, fromIdx, rate)
+      const audio = new Audio(edgeTtsUrl(sentences[fromIdx], edgeVoiceFor(accent), params.rate, params.pitch))
+      audio.preload = 'auto'
       currentPlayingAudio = audio
-      audio.playbackRate = rate
 
       audio.onended = () => {
         if (broadcastSessionId !== mySession) return
-        currentIdx++
         setTimeout(() => {
-          if (broadcastSessionId === mySession) playNextChunk()
+          if (broadcastSessionId === mySession) playEdgeFrom(fromIdx + 1)
         }, 180)
       }
 
-      audio.onerror = () => {
+      const failover = () => {
         if (broadcastSessionId !== mySession) return
-        playExpressiveOfflineProsodyTTS(sentences.slice(currentIdx), mySession, accent, rate)
+        playYoudaoFrom(fromIdx)
       }
-
+      audio.onerror = failover
       const playProm = audio.play()
       if (playProm !== undefined) {
-        playProm.catch(() => {
-          if (broadcastSessionId !== mySession) return
-          playExpressiveOfflineProsodyTTS(sentences.slice(currentIdx), mySession, accent, rate)
-        })
+        playProm.catch(failover)
       }
     }
 
-    playNextChunk()
+    playEdgeFrom(0)
   } else {
     playExpressiveOfflineProsodyTTS(sentences, mySession, accent, rate)
   }

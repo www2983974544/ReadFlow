@@ -83,6 +83,12 @@ export function updateFinishedButtonState(art: { readStatus: string }) {
   const pill = document.getElementById('articleReadStatusPill')
   if (!btnFin || !art) return
 
+  // "读下一篇" surfaces only for finished articles (and when another exists)
+  const btnNext = document.getElementById('btnNextArticle')
+  if (btnNext) {
+    btnNext.classList.toggle('hidden', !(art.readStatus === 'finished' && S().articles.length > 1))
+  }
+
   if (art.readStatus === 'finished') {
     btnFin.textContent = '↩ 已精读完成 (点击取消)'
     btnFin.className =
@@ -102,7 +108,59 @@ export function updateFinishedButtonState(art: { readStatus: string }) {
   }
 }
 
-export function renderCurrentArticle() {
+// Session-local per-article quiz answers (drives the summary counter/dot).
+const quizSessionAnswers = new Map<string, Set<number>>()
+
+function updateQuizSummaryMeta(art: { id: string; quiz: { q: string }[] } | null | undefined) {
+  const meta = document.getElementById('quizSummaryMeta')
+  const dot = document.getElementById('quizUnansweredDot')
+  if (!meta) return
+  if (!art) return
+  const total = (art.quiz || []).length
+  const answered = quizSessionAnswers.get(art.id)?.size || 0
+  meta.textContent = total === 0 ? '（本篇暂无自测题）' : `（${total} 题 · 已答 ${answered}）`
+  if (dot) dot.classList.toggle('hidden', total === 0 || answered >= total)
+}
+
+export function recordQuizAnswered(articleId: string, questionIndex: number) {
+  let set = quizSessionAnswers.get(articleId)
+  if (!set) {
+    set = new Set<number>()
+    quizSessionAnswers.set(articleId, set)
+  }
+  set.add(questionIndex)
+  const art = S().articles.find((a) => a.id === articleId)
+  updateQuizSummaryMeta(art)
+}
+
+export function resetWordInspector() {
+  const s = S()
+  clearActiveWordSelection()
+  s.activeWord = ''
+  s.activeWordLemma = ''
+  s.activeContextSentence = ''
+
+  const el = (id: string) => document.getElementById(id)
+  const setText = (id: string, text: string) => {
+    const node = el(id)
+    if (node) node.textContent = text
+  }
+  setText('inspectWordText', '—')
+  setText('inspectWordPhonetic', '')
+  setText('inspectWordLemma', '原型: —')
+  setText('inspectWordExamTag', '待选择')
+  setText('inspectWordMeaning', '点击正文任意单词，0ms 查询释义、派生词与同义词')
+  setText('inspectWordEnglishDef', 'Offline instant lookup ready.')
+  setText('inspectWordDerivatives', '—')
+  setText('inspectWordSynonyms', '—')
+  setText('inspectWordEtymology', '—')
+  setText('inspectWordContext', 'Selected from current reading passage.')
+  const noteInput = el('inputCustomWordNote') as HTMLInputElement | null
+  if (noteInput) noteInput.value = ''
+  setText('wordInspectorBadge', '未选中 · 点击任意词')
+}
+
+export function renderCurrentArticle(options?: { resetInspector?: boolean }) {
   const s = S()
   const art = s.articles.find((a) => a.id === s.currentArticleId) || s.articles[0]
   if (!art) return
@@ -224,6 +282,11 @@ export function renderCurrentArticle() {
   }
 
   renderArticleMarkedWordsList()
+
+  if (options?.resetInspector) {
+    resetWordInspector()
+  }
+  updateQuizSummaryMeta(art)
 }
 
 export function selectWordForInspection(rawWord: string, paraText: string, clickedSpanEl: HTMLSpanElement | null) {
@@ -478,6 +541,21 @@ export async function toggleArticleFinished() {
     updateTopBadgesAndStats()
     renderSidebarArticleList()
     renderCurrentArticle()
+    const quizDetails = document.getElementById('quizDetails') as HTMLDetailsElement | null
+    if (quizDetails) quizDetails.open = true
     showToast(`🎉 恭喜完成本篇精读！已自动计入统计 (+${estMins}分钟 / +${artWords}词)`)
   }
+}
+
+export async function goNextArticle() {
+  const s = S()
+  const idx = s.articles.findIndex((a) => a.id === s.currentArticleId)
+  if (idx === -1 || s.articles.length <= 1) return
+  const next = s.articles[(idx + 1) % s.articles.length]
+  s.currentArticleId = next.id
+  renderSidebarArticleList()
+  renderCurrentArticle({ resetInspector: true })
+  const pane = document.getElementById('centerReaderPane')
+  if (pane) pane.scrollTop = 0
+  showToast(`📖 下一篇：${next.titleCn || next.title}`)
 }

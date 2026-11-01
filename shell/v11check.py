@@ -142,6 +142,60 @@ def _checks() -> None:
     time.sleep(0.2)
     js("theme.light", "document.getElementById('btnThemeLight').click(), document.body.className")
 
+    # --- v1.1 batch 2: axis alignment ---
+    js(
+        "axis.aligned",
+        "(()=>{const m=document.querySelector('.reader-masthead').getBoundingClientRect();"
+        "const b=document.getElementById('readerParagraphsContainer').getBoundingClientRect();"
+        "return (Math.abs(m.width-b.width)<2)+';';})()",
+    )
+
+    # --- stat strip units ---
+    js("stat.units", "document.querySelector('.reader-stat-strip').textContent.includes('篇')")
+
+    # --- quiz summary meta + dot ---
+    js("quiz.metaText", "document.getElementById('quizSummaryMeta').textContent")
+    js("quiz.dotVisible", "!document.getElementById('quizUnansweredDot').classList.contains('hidden')")
+
+    # --- /api/tts reachability (network down → 503, not crash) ---
+    js(
+        "tts.status",
+        "(()=>{const x=new XMLHttpRequest();x.open('GET','/api/tts?text=hello',false);x.send();return x.status+';';})()",
+    )
+
+    # --- finish flow: next button + auto-expanded quiz + go-next ---
+    js("finish.click", "document.getElementById('btnMarkArticleFinished').click()")
+    time.sleep(1.2)
+    js("finish.nextBtnVisible", "!document.getElementById('btnNextArticle').classList.contains('hidden')")
+    js("finish.quizAutoOpen", "document.getElementById('quizDetails').open")
+    js("finish.pill", "document.getElementById('articleReadStatusPill').textContent")
+    js("finish.nextTitleBefore", "document.getElementById('readerArticleTitle').textContent.slice(0, 20)")
+    js("finish.goNext", "document.getElementById('btnNextArticle').click()")
+    time.sleep(0.8)
+    js("finish.nextTitleAfter", "document.getElementById('readerArticleTitle').textContent.slice(0, 24)")
+    js("finish.inspectorReset", "document.getElementById('inspectWordMeaning').textContent.slice(0, 12)")
+    js("finish.nextBtnHiddenAgain", "document.getElementById('btnNextArticle').classList.contains('hidden')")
+
+    # --- selection → translate tab ---
+    js(
+        "select.simulate",
+        "(()=>{const p=document.querySelectorAll('#readerParagraphsContainer p')[1];"
+        "const r=document.createRange();r.selectNodeContents(p);"
+        "const s=window.getSelection();s.removeAllRanges();s.addRange(r);"
+        "document.getElementById('centerReaderPane').dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));"
+        "return 'ok;';})()",
+    )
+    time.sleep(0.6)
+    js("select.tabShown", "!document.getElementById('inspectorTabPanelTrans').classList.contains('hidden')")
+    js("select.filled", "document.getElementById('inputFreeTranslate').value.length > 30")
+    js("select.output", "document.getElementById('outputFreeTranslate').textContent.length > 10")
+
+    # --- cosmos pause switch ---
+    js("cosmos.pausedOnReader", "window.__cosmosPaused === true")
+    js("cosmos.navHome", "document.getElementById('navTabHome').click()")
+    time.sleep(0.3)
+    js("cosmos.resumedOnHome", "window.__cosmosPaused === false")
+
 
 def main() -> None:
     global WINDOW
