@@ -2,7 +2,7 @@
 // runSmartArticleCrawler / renderCrawlerDiscoveryGrid + bindings).
 import { apiPost } from '../api/client'
 import { S } from './state'
-import { renderCurrentArticle, renderSidebarArticleList } from './reader'
+import { openArticleForReading, renderSidebarArticleList } from './reader'
 import { showToast, updateTopBadgesAndStats } from './ui-fns'
 import { useArticlesStore } from '../stores/articles'
 import { useUiStore } from '../stores/ui'
@@ -165,10 +165,8 @@ export function initCrawlerView() {
     const target = e.target as HTMLElement
     const openBtn = target.closest('.btn-card-open-read') as HTMLElement | null
     if (openBtn) {
-      s.currentArticleId = openBtn.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle({ resetInspector: true })
+      openArticleForReading(openBtn.getAttribute('data-artid') || '')
       return
     }
     const libBtn = target.closest('.btn-card-toggle-lib') as HTMLElement | null
@@ -187,10 +185,8 @@ export function initCrawlerView() {
     // clicking anywhere on the card opens it for reading (user-requested v2.0 change)
     const card = target.closest('.crawl-card') as HTMLElement | null
     if (card) {
-      s.currentArticleId = card.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle({ resetInspector: true })
+      openArticleForReading(card.getAttribute('data-artid') || '')
     }
   })
 

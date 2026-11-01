@@ -476,6 +476,32 @@ export function clearActiveWordSelection() {
   }
 }
 
+// Focus mode: both panes collapse so only the article remains. Triggered on
+// every reader entry and every article switch; the hint toast fires once per
+// session. Word-click auto-expanding the right pane is unaffected.
+let focusHintShown = false
+
+export function enterFocusReading() {
+  const s = S()
+  s.leftCollapsed = true
+  s.rightCollapsed = true
+  applySidebarCollapseLayout()
+  if (!focusHintShown) {
+    focusHintShown = true
+    showToast('💡 两侧栏已收起：点顶部「▶ 展开左栏 / 右栏 ◀」或栏间空隙展开')
+  }
+}
+
+export function openArticleForReading(articleId: string) {
+  const s = S()
+  s.currentArticleId = articleId
+  renderSidebarArticleList()
+  renderCurrentArticle({ resetInspector: true })
+  enterFocusReading()
+  const pane = document.getElementById('centerReaderPane')
+  if (pane) pane.scrollTop = 0
+}
+
 export function renderSidebarArticleList() {
   const s = S()
   const container = document.getElementById('sidebarArticleList')
@@ -557,10 +583,6 @@ export async function goNextArticle() {
   const idx = s.articles.findIndex((a) => a.id === s.currentArticleId)
   if (idx === -1 || s.articles.length <= 1) return
   const next = s.articles[(idx + 1) % s.articles.length]
-  s.currentArticleId = next.id
-  renderSidebarArticleList()
-  renderCurrentArticle({ resetInspector: true })
-  const pane = document.getElementById('centerReaderPane')
-  if (pane) pane.scrollTop = 0
+  openArticleForReading(next.id)
   showToast(`📖 下一篇：${next.titleCn || next.title}`)
 }

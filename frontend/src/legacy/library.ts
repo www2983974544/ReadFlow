@@ -1,6 +1,6 @@
 // My library view (ported from renderMyLibraryGrid + bindings + JSON export).
 import { S } from './state'
-import { renderCurrentArticle, renderSidebarArticleList, updateFinishedButtonState } from './reader'
+import { openArticleForReading, renderSidebarArticleList, updateFinishedButtonState } from './reader'
 import { recordTodayStudyDelta, showToast, updateTopBadgesAndStats } from './ui-fns'
 import { useArticlesStore } from '../stores/articles'
 import { useUiStore } from '../stores/ui'
@@ -109,10 +109,8 @@ export function initLibraryView() {
     const target = e.target as HTMLElement
     const openBtn = target.closest('.btn-lib-open') as HTMLElement | null
     if (openBtn) {
-      s.currentArticleId = openBtn.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle({ resetInspector: true })
+      openArticleForReading(openBtn.getAttribute('data-artid') || '')
       return
     }
     const toggleFinBtn = target.closest('.btn-lib-toggle-fin') as HTMLElement | null
@@ -161,10 +159,8 @@ export function initLibraryView() {
     // clicking anywhere on the card opens it for reading (user-requested v2.0 change)
     const card = target.closest('.lib-card') as HTMLElement | null
     if (card) {
-      s.currentArticleId = card.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle({ resetInspector: true })
+      openArticleForReading(card.getAttribute('data-artid') || '')
     }
   })
 }

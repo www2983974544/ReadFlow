@@ -71,6 +71,31 @@ def _checks() -> None:
     time.sleep(0.5)
     visible("viewReader")
 
+    # --- focus mode on entry: both panes collapsed + one-time toast ---
+    js(
+        "entry.collapsedBoth",
+        "document.getElementById('leftSidebarPane').classList.contains('hidden') && "
+        "document.getElementById('rightInspectorPane').classList.contains('hidden')",
+    )
+    js("entry.immersiveClass", "document.body.className.includes('reader-immersive')")
+    js("entry.toastText", "document.getElementById('toastText').textContent.slice(0, 10)")
+
+    # --- article switch re-collapses (expand left first, then pick another card) ---
+    js("switch.expandLeft", "document.getElementById('btnToggleLeftPane').click()")
+    time.sleep(0.2)
+    js("switch.leftOpen", "!document.getElementById('leftSidebarPane').classList.contains('hidden')")
+    js(
+        "switch.clickOtherCard",
+        "document.querySelectorAll('#sidebarArticleList .sidebar-art-card')[1].click()",
+    )
+    time.sleep(0.6)
+    js(
+        "switch.collapsedAgain",
+        "document.getElementById('leftSidebarPane').classList.contains('hidden') && "
+        "document.getElementById('rightInspectorPane').classList.contains('hidden')",
+    )
+    js("switch.titleChanged", "document.getElementById('readerArticleTitle').textContent.slice(0, 16)")
+
     # --- tab defaults ---
     js("tab.wordActive", "document.getElementById('tabBtnInspectorWord').className.includes('inspector-tab-active')")
     js("tab.wordVisible", "!document.getElementById('inspectorTabPanelWord').classList.contains('hidden')")
@@ -94,7 +119,7 @@ def _checks() -> None:
     js("tab.wordNowHidden", "document.getElementById('inspectorTabPanelWord').classList.contains('hidden')")
 
     # --- word click auto-switches back to word tab ---
-    js("word.click", "document.querySelector('.word-token[data-lemma=\"artificial\"]').click()")
+    js("word.click", "document.querySelector('#readerParagraphsContainer .word-token').click()")
     time.sleep(0.3)
     js("tab.backToWord", "!document.getElementById('inspectorTabPanelWord').classList.contains('hidden')")
     js("inspect.phonetic", "document.getElementById('inspectWordPhonetic').textContent")
@@ -179,6 +204,11 @@ def _checks() -> None:
     js("finish.nextTitleAfter", "document.getElementById('readerArticleTitle').textContent.slice(0, 24)")
     js("finish.inspectorReset", "document.getElementById('inspectWordMeaning').textContent.slice(0, 12)")
     js("finish.nextBtnHiddenAgain", "document.getElementById('btnNextArticle').classList.contains('hidden')")
+    js(
+        "finish.collapsedAfterNext",
+        "document.getElementById('leftSidebarPane').classList.contains('hidden') && "
+        "document.getElementById('rightInspectorPane').classList.contains('hidden')",
+    )
 
     # --- selection → translate tab ---
     js(

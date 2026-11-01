@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { S } from '../legacy/state'
 import {
   applySidebarCollapseLayout,
@@ -10,8 +10,10 @@ import {
 import {
   clearActiveWordSelection,
   clearWordMark,
+  enterFocusReading,
   goNextArticle,
   markCurrentWord,
+  openArticleForReading,
   recordQuizAnswered,
   renderCurrentArticle,
   renderSidebarArticleList,
@@ -30,6 +32,14 @@ import { useStatsStore } from '../stores/stats'
 import { useUiStore } from '../stores/ui'
 
 const ui = useUiStore()
+
+// 每次进入精读页 = 专注阅读模式（切换文章同样收起，见 openArticleForReading）
+watch(
+  () => ui.activeView,
+  (v) => {
+    if (v === 'reader') enterFocusReading()
+  },
+)
 
 function el<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null
@@ -96,10 +106,7 @@ onMounted(() => {
   el('sidebarArticleList')?.addEventListener('click', (e) => {
     const card = (e.target as HTMLElement).closest('.sidebar-art-card') as HTMLElement | null
     if (!card) return
-    s.currentArticleId = card.getAttribute('data-artid') || ''
-    renderSidebarArticleList()
-    renderCurrentArticle({ resetInspector: true })
-    el('centerReaderPane')!.scrollTop = 0
+    openArticleForReading(card.getAttribute('data-artid') || '')
   })
 
   // Selection → instant translate (drag-select ≥2 words fills the translator tab)
