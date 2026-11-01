@@ -76,6 +76,25 @@ export function renderCrawlerDiscoveryGrid() {
 
 let crawlRunning = false
 
+// Status pill: ready (emerald) / busy (amber) / fail (rose, online fetch failed)
+function setCrawlerPulse(state: 'ready' | 'busy' | 'fail') {
+  const dot = document.getElementById('crawlerPulseDot')
+  if (!dot) return
+  const inner = {
+    ready: '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>READY',
+    busy: '<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>CRAWLING',
+    fail: '<span class="w-2 h-2 rounded-full bg-rose-400"></span>OFFLINE',
+  }[state]
+  const color = state === 'ready' ? 'text-emerald-400' : state === 'busy' ? 'text-amber-400' : 'text-rose-400'
+  dot.className = 'inline-flex items-center gap-1 shrink-0 ' + color
+  dot.innerHTML = inner
+}
+
+function openLogDrawer() {
+  const drawer = document.querySelector('.crawl-log-drawer') as HTMLDetailsElement | null
+  if (drawer) drawer.open = true
+}
+
 export async function runCrawlFlow() {
   if (crawlRunning) return // real crawls take up to ~22s; block double-fires
   crawlRunning = true
@@ -87,6 +106,7 @@ export async function runCrawlFlow() {
     }
   }
   setCrawlBtn('⏳ 抓取中…', true)
+  setCrawlerPulse('busy')
 
   const logBox = document.getElementById('crawlerTerminalOutput')
   const statusHint = document.getElementById('crawlerStatusHint')
@@ -115,7 +135,7 @@ export async function runCrawlFlow() {
     } else if (!online) {
       appendLog('[OFFLINE-MODE] 检测到离线状态，已从本地四六级同源题库极速加载候选文章。')
     } else {
-      appendLog('[OFFLINE-ENGINE] 已使用内置高分同源外刊库完成匹配。')
+      appendLog('[OFFLINE-ENGINE] 在线外刊源全部超时/失败（网络异常），已使用内置题库兜底。')
     }
 
     // sync articles inserted server-side (front-of-list order included)
@@ -123,16 +143,33 @@ export async function runCrawlFlow() {
     updateTopBadgesAndStats()
     renderCrawlerDiscoveryGrid()
     renderSidebarArticleList()
-    if (statusHint) {
-      statusHint.textContent =
-        addedCount > 0
-          ? `匹配完成！已新增 ${addedCount} 篇同源文章，请在下方选择是否加入文章库。`
-          : '当前候选池已包含全部最新同源外刊，可直接挑选入库或点击「手动粘贴导入」。'
+
+    if (res.live) {
+      setCrawlerPulse('ready')
+      if (statusHint) {
+        statusHint.textContent =
+          addedCount > 0
+            ? `匹配完成！已新增 ${addedCount} 篇同源文章，请在下方选择是否加入文章库。`
+            : '当前候选池已包含全部最新同源外刊，可直接挑选入库或点击「手动粘贴导入」。'
+      }
+      showToast('🌐 同源外刊匹配完成！')
+    } else if (!online) {
+      setCrawlerPulse('ready')
+      if (statusHint) statusHint.textContent = '📴 当前处于离线状态，已从本地四六级同源题库加载候选文章；联网后可抓取实时外刊。'
+      showToast('📴 离线模式：已加载内置题库')
+    } else {
+      // navigator.onLine says online but every source failed — say so honestly.
+      setCrawlerPulse('fail')
+      openLogDrawer()
+      if (statusHint) statusHint.textContent = '⚠️ 在线外刊源抓取失败（网络异常），已使用内置题库兜底；请检查网络后重试。'
+      showToast('⚠️ 在线源抓取失败（网络异常），已用内置题库兜底')
     }
-    showToast('🌐 同源外刊匹配完成！')
   } catch {
-    appendLog('[OFFLINE-ENGINE] 已使用内置高分同源外刊库完成匹配。')
-    if (statusHint) statusHint.textContent = '当前候选池已包含全部最新同源外刊，可直接挑选入库或点击「手动粘贴导入」。'
+    setCrawlerPulse('fail')
+    openLogDrawer()
+    appendLog('[OFFLINE-ENGINE] 抓取请求失败，已使用内置高分同源外刊库完成匹配。')
+    if (statusHint) statusHint.textContent = '⚠️ 抓取请求失败（服务异常），已使用内置题库兜底；请重试。'
+    showToast('⚠️ 抓取请求失败，已用内置题库兜底')
   } finally {
     crawlRunning = false
     setCrawlBtn('🚀 立即抓取同源外刊', false)
