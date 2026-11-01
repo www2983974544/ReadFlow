@@ -184,10 +184,6 @@ export function initStatsView() {
     showToast('🔥 今日打卡记录成功！已增加 15 分钟精读时长与 350 阅读词数')
   })
 
-  document.getElementById('btnResetAllStats')?.addEventListener('click', async () => {
-    await resetAllPersonalStatsToZero()
-    showToast('🗑️ 个人时间统计与阅读数据已全部清空归零')
-  })
-
+  // 清零按钮的二次确认由 StatsView.vue 的确认弹窗负责（v1.2），确认后调用 resetAllPersonalStatsToZero()
   renderStatsAndHeatmap()
 }

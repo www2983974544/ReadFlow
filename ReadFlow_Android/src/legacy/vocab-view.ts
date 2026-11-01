@@ -13,17 +13,28 @@ export function renderVocabNotebook() {
   const grid = document.getElementById('vocabNotebookGrid')
   if (!grid) return
   const allMarks = Object.values(s.wordMarks)
+  // v1.2 搜索：匹配单词/原型/释义/批注/来源文章
+  const query = ((document.getElementById('inputSearchVocab') as HTMLInputElement | null)?.value || '')
+    .trim()
+    .toLowerCase()
   const filtered = allMarks.filter((m) => {
-    if (s.vocabFilter === 'all') return true
-    return m.status === s.vocabFilter
+    if (s.vocabFilter !== 'all' && m.status !== s.vocabFilter) return false
+    if (query) {
+      const haystack = `${m.word} ${m.lemma} ${m.cn} ${m.customNote || ''} ${m.articleTitle || ''}`.toLowerCase()
+      if (!haystack.includes(query)) return false
+    }
+    return true
   })
 
   if (filtered.length === 0) {
+    const emptyText = query
+      ? '没有匹配搜索词的生词，换个关键词试试。'
+      : '在「外刊精读」阅读文章时，点击任意英文单词并在查词台点击「陌生生词 / 四六级核心 / 已熟记」即可收录至此。'
     grid.innerHTML = `
-          <div class="col-span-full surface-card border border-dashed p-10 text-center space-y-2">
+          <div class="surface-card border border-dashed p-10 text-center space-y-2">
             <div class="text-3xl">🔖</div>
-            <h3 class="text-base font-bold">暂无该类别的已标注单词</h3>
-            <p class="text-xs opacity-70">在「外刊精读」阅读文章时，点击任意英文单词并在右侧点击「陌生生词 / 四六级核心 / 已熟记」即可收录至此。</p>
+            <h3 class="text-base font-bold">${query ? '未找到匹配的生词' : '暂无该类别的已标注单词'}</h3>
+            <p class="text-xs opacity-70">${emptyText}</p>
           </div>
         `
     return
@@ -142,6 +153,9 @@ export function initVocabView() {
 
   document.getElementById('btnExportVocabCsv')?.addEventListener('click', exportVocabCsv)
 
+  // v1.2 搜索
+  document.getElementById('inputSearchVocab')?.addEventListener('input', renderVocabNotebook)
+
   // Delegated listener for Vocab Grid
   document.getElementById('vocabNotebookGrid')?.addEventListener('click', async (e) => {
     const target = e.target as HTMLElement
@@ -153,12 +167,26 @@ export function initVocabView() {
     const delBtn = target.closest('.btn-vocab-del') as HTMLElement | null
     if (delBtn) {
       const lem = delBtn.getAttribute('data-lemma') || ''
+      const removed = s.wordMarks[lem]
       await useVocabStore().unmark(lem)
       updateTopBadgesAndStats()
       renderVocabNotebook()
       updateWordTokensInPlace(lem)
       renderArticleMarkedWordsList()
-      showToast('已从单词库移除')
+      showToast(`已删除「${removed?.word || lem}」`, {
+        action: {
+          label: '撤销',
+          run: () => {
+            if (!removed) return
+            void useVocabStore().mark(removed).then(() => {
+              updateTopBadgesAndStats()
+              renderVocabNotebook()
+              updateWordTokensInPlace(lem)
+              renderArticleMarkedWordsList()
+            })
+          },
+        },
+      })
     }
   })
 }

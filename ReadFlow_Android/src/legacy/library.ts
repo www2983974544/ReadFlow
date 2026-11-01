@@ -163,7 +163,20 @@ export function initLibraryView() {
         updateTopBadgesAndStats()
         renderMyLibraryGrid()
         renderSidebarArticleList()
-        showToast(`已将《${art.titleCn}》移出文章库`)
+        showToast(`已将《${art.titleCn}》移出文章库`, {
+          action: {
+            label: '撤销',
+            run: () => {
+              void useArticlesStore()
+                .patch(id, { inLibrary: true })
+                .then(() => {
+                  updateTopBadgesAndStats()
+                  renderMyLibraryGrid()
+                  renderSidebarArticleList()
+                })
+            },
+          },
+        })
       }
       return
     }

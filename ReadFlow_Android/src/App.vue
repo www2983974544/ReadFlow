@@ -13,7 +13,7 @@ import { useVocabStore } from './stores/vocab'
 import { useStatsStore } from './stores/stats'
 import { useSettingsStore } from './stores/settings'
 import { useUiStore } from './stores/ui'
-import { toastVisible, toastText, applyThemeMode, applySidebarCollapseLayout, updateTopBadgesAndStats, showToast } from './legacy/ui-fns'
+import { toastVisible, toastText, toastAction, applyThemeMode, applySidebarCollapseLayout, updateTopBadgesAndStats, showToast, dismissToast, runToastAction } from './legacy/ui-fns'
 import { S, hydrateExamSettings } from './legacy/state'
 import {
   clearActiveWordSelection,
@@ -28,6 +28,7 @@ import { translateSentenceOfflineOrOnline } from './legacy/translate'
 import { initVoices, speakSingleWord } from './core/tts'
 import { APP_VERSION } from './version'
 import { isNative, nativePlugin } from './native/bridge'
+import { readClipboardText } from './native/clipboard'
 import type { Article } from './types'
 
 const ui = useUiStore()
@@ -119,6 +120,25 @@ function setupBackButton() {
   })
 }
 
+// 剪贴板一键导入（v1.2）：把剪贴板文本填入正文编辑区
+async function pasteFromClipboard() {
+  const text = await readClipboardText()
+  const body = document.getElementById('customInputBody') as HTMLTextAreaElement | null
+  if (!body) return
+  if (!text.trim()) {
+    showToast('剪贴板为空或无权读取，请手动粘贴')
+    return
+  }
+  body.value = text.trim()
+  // 标题为空时用第一行兜底
+  const title = document.getElementById('customInputTitle') as HTMLInputElement | null
+  if (title && !title.value.trim()) {
+    const firstLine = text.trim().split(/\n/)[0] || ''
+    if (firstLine.length <= 80) title.value = firstLine
+  }
+  showToast('📋 已从剪贴板填入正文')
+}
+
 // 自定义文章导入（与桌面 App.vue submitCustomArticle 同逻辑）
 async function submitCustomArticle() {
   const get = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null
@@ -200,9 +220,15 @@ async function submitCustomArticle() {
 
   <BottomTabBar />
 
-  <!-- Toast（移动端：底部居中，位于标签栏上方） -->
-  <div class="toast" :class="{ 'toast-show': toastVisible }">
-    <span>{{ toastText }}</span>
+  <!-- Toast（移动端：底部居中，位于标签栏上方；点按关闭；可带撤销动作） -->
+  <div class="toast" :class="{ 'toast-show': toastVisible }" @click="dismissToast">
+    <span class="toast-msg">{{ toastText }}</span>
+    <button
+      v-if="toastAction"
+      type="button"
+      class="toast-action"
+      @click.stop="runToastAction"
+    >{{ toastAction.label }}</button>
   </div>
 
   <!-- 自定义文章导入弹窗 -->
@@ -213,6 +239,7 @@ async function submitCustomArticle() {
         <button type="button" class="modal-close" @click="ui.customImportOpen = false">✕</button>
       </div>
       <div class="import-body">
+        <button type="button" class="clipboard-btn" @click="pasteFromClipboard">📋 读取剪贴板填入正文</button>
         <div class="grid grid-cols-1 gap-2.5 text-xs">
           <div>
             <label class="block font-semibold mb-1">文章标题：</label>
@@ -340,6 +367,21 @@ async function submitCustomArticle() {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+.toast .toast-msg {
+  min-width: 0;
+}
+.toast .toast-action {
+  margin-left: 10px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
 
 .modal-mask {
   position: fixed;
@@ -421,6 +463,17 @@ async function submitCustomArticle() {
 }
 .import-input:focus {
   border-color: var(--accent);
+}
+.clipboard-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
 }
 .import-foot {
   display: flex;

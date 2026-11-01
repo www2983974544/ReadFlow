@@ -21,15 +21,118 @@ import {
 import { initInspectorTabs, switchInspectorTab } from '../legacy/inspector-tabs'
 import { applyCustomTimerMinutes, resetExamTimer, toggleExamTimer } from '../legacy/timer'
 import { translateSentenceOfflineOrOnline } from '../legacy/translate'
-import { speakPassageBroadcast, speakSingleWord } from '../core/tts'
+import { speakPassageBroadcast, speakSingleWord, stopSpeechPlayback } from '../core/tts'
 import { useStatsStore } from '../stores/stats'
 import { useUiStore } from '../stores/ui'
 
 const ui = useUiStore()
 
+// ---- v1.2 阅读进度条 + 滚动位置记忆 ----
+const readProgress = ref(0)
+const scrollMemory = new Map<string, number>()
+let scrollSaveTimer = 0
+
+// ---- v1.2 段落朗读悬浮球：朗读当前视口所在段，朗读中再点即停 ----
+const ballSpeaking = ref(false)
+
+function currentViewportParaIdx(): number {
+  const pane = document.getElementById('centerReaderPane')
+  if (!pane) return 0
+  const rows = Array.from(pane.querySelectorAll<HTMLDivElement>('[id^="paraRow-"]'))
+  const anchorY = pane.getBoundingClientRect().top + 96
+  for (const row of rows) {
+    if (row.getBoundingClientRect().bottom > anchorY) {
+      return parseInt(row.id.replace('paraRow-', ''), 10) || 0
+    }
+  }
+  return Math.max(0, rows.length - 1)
+}
+
+function onSpeakBall() {
+  const s = S()
+  const speakingRow = document.querySelector('#readerParagraphsContainer .speaking-para-highlight')
+  if (ballSpeaking.value || speakingRow) {
+    stopSpeechPlayback()
+    ballSpeaking.value = false
+    return
+  }
+  const art = s.articles.find((a) => a.id === s.currentArticleId)
+  if (!art) return
+  const idx = Math.min(currentViewportParaIdx(), art.paragraphs.length - 1)
+  ballSpeaking.value = true
+  speakPassageBroadcast(art.paragraphs[idx]?.en || '', false, idx)
+  // 朗读结束（highlight 移除）后复位按钮态；停止/失败同样复位
+  const row = document.getElementById('paraRow-' + idx)
+  if (row) {
+    const obs = new MutationObserver(() => {
+      if (!row.classList.contains('speaking-para-highlight')) {
+        ballSpeaking.value = false
+        obs.disconnect()
+      }
+    })
+    obs.observe(row, { attributes: true, attributeFilter: ['class'] })
+    // 兜底：10 分钟后强制复位
+    setTimeout(() => {
+      ballSpeaking.value = false
+      obs.disconnect()
+    }, 600000)
+  }
+}
+
+// ---- v1.2 查词台把手下拉关闭 ----
+const sheetDragY = ref(0)
+let sheetDragStartY = 0
+let sheetDragging = false
+
+function onSheetHandleDown(e: PointerEvent) {
+  sheetDragging = true
+  sheetDragStartY = e.clientY
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+}
+function onSheetHandleMove(e: PointerEvent) {
+  if (!sheetDragging) return
+  sheetDragY.value = Math.max(0, e.clientY - sheetDragStartY)
+}
+function onSheetHandleUp() {
+  if (!sheetDragging) return
+  sheetDragging = false
+  const dragged = sheetDragY.value
+  sheetDragY.value = 0
+  if (dragged > 70) {
+    S().rightCollapsed = true
+    applySidebarCollapseLayout()
+  }
+}
+
+// ---- v1.2 工具栏横滑提示 ----
+const toolbarAtEnd = ref(false)
+const toolbarWrap = ref<HTMLElement | null>(null)
+
+function onToolbarScroll() {
+  const wrap = toolbarWrap.value
+  if (!wrap) return
+  const scroller = wrap.querySelector('.toolbar-scroll') as HTMLElement | null
+  if (!scroller) return
+  toolbarAtEnd.value = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 6
+  // 进度条 + 滚动位置记忆（同一次滚动事件顺带处理）
+  const pane = document.getElementById('centerReaderPane')
+  if (pane) {
+    const max = pane.scrollHeight - pane.clientHeight
+    readProgress.value = max > 0 ? Math.min(100, Math.round((pane.scrollTop / max) * 100)) : 0
+    const s = S()
+    if (s.currentArticleId) {
+      if (scrollSaveTimer) clearTimeout(scrollSaveTimer)
+      scrollSaveTimer = window.setTimeout(() => {
+        scrollMemory.set(s.currentArticleId, pane.scrollTop)
+      }, 250)
+    }
+  }
+}
+
 // ---- 划词翻译气泡（v1.1 触屏优化）：选中 ≥2 个英文词后浮出，点按直达翻译台 ----
 const selBubble = ref<{ x: number; y: number; text: string } | null>(null)
 let selDebounce = 0
+let toolbarNudged = false
 
 function refreshSelBubble() {
   const sel = window.getSelection()
@@ -83,11 +186,29 @@ async function onSelBubbleTap() {
   showToast('🌐 已填入词句翻译台')
 }
 
-// 每次进入精读页 = 专注阅读模式（抽屉/查词台自动收起，切换文章同样收起）
+// 每次进入精读页 = 专注阅读模式（抽屉/查词台自动收起，切换文章同样收起）；
+// v1.2：恢复上次阅读滚动位置（重新打开文章则从零开始，由 openArticleForReading 归零并覆盖记忆）
 watch(
   () => ui.activeView,
   (v) => {
-    if (v === 'reader') enterFocusReading()
+    if (v === 'reader') {
+      enterFocusReading()
+      const pane = document.getElementById('centerReaderPane')
+      const s = S()
+      const saved = s.currentArticleId ? scrollMemory.get(s.currentArticleId) : 0
+      if (pane && saved && saved > 0) {
+        pane.scrollTop = saved
+      }
+      // 首次进入时轻推工具栏一次（发现右侧还有按钮）
+      if (!toolbarNudged && toolbarWrap.value) {
+        toolbarNudged = true
+        const scroller = toolbarWrap.value.querySelector('.toolbar-scroll') as HTMLElement | null
+        if (scroller && scroller.scrollWidth > scroller.clientWidth + 8) {
+          scroller.scrollTo({ left: 56, behavior: 'smooth' })
+          setTimeout(() => scroller.scrollTo({ left: 0, behavior: 'smooth' }), 420)
+        }
+      }
+    }
   },
 )
 
@@ -209,6 +330,11 @@ onMounted(() => {
 
     if (!target.closest('button, select, input, a')) {
       clearActiveWordSelection()
+      // v1.2：点正文空白 = 想安静阅读，自动收起查词台
+      if (!s.rightCollapsed) {
+        s.rightCollapsed = true
+        applySidebarCollapseLayout()
+      }
     }
   })
 
@@ -389,7 +515,10 @@ onMounted(() => {
   })
   el('centerReaderPane')?.addEventListener('scroll', () => {
     selBubble.value = null
+    onToolbarScroll()
   }, { passive: true })
+  // 工具栏横滑到末尾检测（渐隐提示）
+  toolbarWrap.value?.querySelector('.toolbar-scroll')?.addEventListener('scroll', onToolbarScroll, { passive: true })
 })
 </script>
 
@@ -408,9 +537,13 @@ onMounted(() => {
 
     <!-- 中央正文滚动列 -->
     <div id="centerReaderPane" class="center-reader-pane">
-      <!-- 单行横滑工具栏（sticky，绝不遮挡正文以外区域） -->
+      <!-- 单行横滑工具栏（sticky，绝不遮挡正文以外区域；顶部细进度条 v1.2） -->
       <div class="surface-card reader-toolbar-card sticky top-0 z-10">
-        <div class="toolbar-scroll">
+        <div class="read-progress-track">
+          <div class="read-progress-bar" :style="{ width: readProgress + '%' }"></div>
+        </div>
+        <div ref="toolbarWrap" class="toolbar-scroll-wrap">
+          <div class="toolbar-scroll">
           <button id="btnToggleLeftPane" type="button" class="toolbar-pill-btn bg-indigo-50 text-indigo-700 border border-indigo-200">📂 目录</button>
           <button id="btnReadFullArticle" type="button" class="toolbar-pill-btn bg-indigo-50 text-indigo-700 border border-indigo-200">🔊 朗读</button>
           <span class="tool-divider"></span>
@@ -444,6 +577,9 @@ onMounted(() => {
           <span class="tool-divider"></span>
           <button id="btnImmersiveBothPanes" type="button" class="toolbar-pill-btn bg-indigo-50 text-indigo-700 border border-indigo-200">🔭 专注</button>
           <button id="btnToggleRightPane" type="button" class="toolbar-pill-btn bg-indigo-50 text-indigo-700 border border-indigo-200">🔍 查词台</button>
+          </div>
+          <!-- 右缘渐隐：提示右侧还有按钮，滑到末尾自动隐藏 -->
+          <div v-show="!toolbarAtEnd" class="toolbar-fade"></div>
         </div>
       </div>
 
@@ -576,9 +712,19 @@ onMounted(() => {
       </div>
     </aside>
 
-    <!-- 查词台底部弹层（三 Tab，点词自动弹出） -->
-    <aside id="rightInspectorPane" class="inspector-sheet">
-      <div class="sheet-handle"><span class="sheet-handle-bar"></span></div>
+    <!-- 查词台底部弹层（三 Tab，点词自动弹出；下拉把手关闭） -->
+    <aside
+      id="rightInspectorPane"
+      class="inspector-sheet"
+      :style="sheetDragY > 0 ? { transform: `translateY(${sheetDragY}px)`, transition: 'none' } : undefined"
+    >
+      <div
+        class="sheet-handle"
+        @pointerdown="onSheetHandleDown"
+        @pointermove="onSheetHandleMove"
+        @pointerup="onSheetHandleUp"
+        @pointercancel="onSheetHandleUp"
+      ><span class="sheet-handle-bar"></span></div>
       <div class="surface-card sheet-card">
         <div class="inspector-tab-bar flex items-stretch" style="border-bottom: 1px solid var(--border-col)">
           <button id="tabBtnInspectorWord" type="button" class="inspector-tab-btn inspector-tab-active flex-1">🔍 查词</button>
@@ -695,6 +841,14 @@ onMounted(() => {
         </div>
       </div>
     </aside>
+    <!-- 段落朗读悬浮球（v1.2）：朗读当前视口所在段，朗读中再点即停 -->
+    <button
+      type="button"
+      class="speak-ball"
+      :class="{ 'speak-ball-active': ballSpeaking }"
+      :title="ballSpeaking ? '停止朗读' : '朗读当前段落'"
+      @click="onSpeakBall"
+    >{{ ballSpeaking ? '⏹' : '🔊' }}</button>
   </section>
 </template>
 
@@ -719,6 +873,32 @@ onMounted(() => {
 /* ---- 工具栏：单行横滑，绝不换行/遮挡 ---- */
 .reader-toolbar-card {
   padding: 6px 8px;
+}
+.read-progress-track {
+  height: 2px;
+  border-radius: 999px;
+  background-color: var(--border-col);
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.read-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background-color: var(--accent);
+  transition: width 0.1s linear;
+}
+.toolbar-scroll-wrap {
+  position: relative;
+}
+.toolbar-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, var(--bg-card) 85%);
 }
 .toolbar-scroll {
   display: flex;
@@ -796,6 +976,30 @@ onMounted(() => {
   to { opacity: 1; }
 }
 
+/* ---- 段落朗读悬浮球 ---- */
+.speak-ball {
+  position: absolute;
+  right: 14px;
+  bottom: 18px;
+  z-index: 22;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background-color: var(--accent);
+  color: #ffffff;
+  font-size: 19px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.42);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.speak-ball:active {
+  transform: scale(0.92);
+}
+.speak-ball-active {
+  background-color: #dc2626;
+}
+
 /* ---- 查词台底部弹层 ---- */
 .inspector-sheet {
   position: absolute;
@@ -824,6 +1028,8 @@ onMounted(() => {
   justify-content: center;
   padding: 7px 0 3px;
   background-color: var(--bg-card);
+  cursor: grab;
+  touch-action: none;
 }
 .sheet-handle-bar {
   width: 44px;

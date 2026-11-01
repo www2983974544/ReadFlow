@@ -21,18 +21,37 @@ export function renderStatsIfVisible() {
   if (useUiStore().activeView === 'stats') hooks.renderStatsAndHeatmap()
 }
 
-// ---- Toast（移动端：底部居中，位于标签栏上方） ----
+// ---- Toast（移动端：底部居中，位于标签栏上方；可点击提前关闭；可带撤销动作） ----
 export const toastVisible = ref(false)
 export const toastText = ref('')
+export const toastAction = ref<{ label: string; run: () => void } | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
-export function showToast(msg: string) {
+export function showToast(
+  msg: string,
+  opts?: { action?: { label: string; run: () => void }; durationMs?: number },
+) {
   toastText.value = msg
+  toastAction.value = opts?.action ?? null
   toastVisible.value = true
   if (toastTimer) clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => {
-    toastVisible.value = false
-  }, 2400)
+  toastTimer = setTimeout(
+    () => {
+      toastVisible.value = false
+    },
+    opts?.action ? Math.max(6000, opts.durationMs ?? 6000) : (opts?.durationMs ?? 2400),
+  )
+}
+
+export function dismissToast() {
+  if (toastTimer) clearTimeout(toastTimer)
+  toastVisible.value = false
+}
+
+export function runToastAction() {
+  const action = toastAction.value
+  dismissToast()
+  if (action) action.run()
 }
 
 // ---- 主题（明亮/护眼/夜间/跟随系统；沿桌面 body class 方案 + 持久化） ----

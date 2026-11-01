@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useUiStore } from '../stores/ui'
-import { initStatsView, renderStatsAndHeatmap } from '../legacy/stats-view'
+import { initStatsView, renderStatsAndHeatmap, resetAllPersonalStatsToZero } from '../legacy/stats-view'
+import { showToast } from '../legacy/ui-fns'
 
 const ui = useUiStore()
+const confirmResetOpen = ref(false)
+
+async function doResetAll() {
+  confirmResetOpen.value = false
+  await resetAllPersonalStatsToZero()
+  showToast('🗑️ 个人时间统计与阅读数据已全部清空归零')
+}
 
 onMounted(() => {
   initStatsView()
@@ -29,7 +37,7 @@ watch(
         <button id="btnLogStudySession" type="button" class="py-2.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm transition">
           ➕ 今日打卡 (+15分/+350词)
         </button>
-        <button id="btnResetAllStats" type="button" title="清空全部统计数据（不可恢复）" class="py-2.5 rounded-xl text-xs font-semibold text-slate-500 border border-slate-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition">
+        <button id="btnResetAllStats" type="button" title="清空全部统计数据（不可恢复）" class="py-2.5 rounded-xl text-xs font-semibold text-slate-500 border border-slate-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition" @click="confirmResetOpen = true">
           🗑️ 清空重置全部数据
         </button>
       </div>
@@ -128,6 +136,19 @@ watch(
       <div id="categoryMasteryContainer" class="space-y-3 text-xs"></div>
     </div>
     <div class="h-4"></div>
+
+    <!-- 清零二次确认弹窗 -->
+    <div v-if="confirmResetOpen" class="confirm-mask" @click.self="confirmResetOpen = false">
+      <div class="confirm-card">
+        <div class="confirm-icon">🗑️</div>
+        <h4 class="confirm-title">确认清空全部数据？</h4>
+        <p class="confirm-text">将清除：全部精读时长与词数统计、364 天热力图记录、自测题记录、<strong>所有已标注生词</strong>，并回退全部「已精读完成」状态。此操作不可恢复。</p>
+        <div class="confirm-actions">
+          <button type="button" class="confirm-cancel" @click="confirmResetOpen = false">先不了</button>
+          <button type="button" class="confirm-danger" @click="doResetAll">确认清空</button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -153,5 +174,67 @@ watch(
 }
 .heatmap-inner {
   min-width: 800px;
+}
+
+/* ---- 清零确认弹窗 ---- */
+.confirm-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  background-color: rgba(2, 6, 23, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.confirm-card {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-col);
+  border-radius: 16px;
+  padding: 20px 18px 16px;
+  text-align: center;
+}
+.confirm-icon {
+  font-size: 30px;
+}
+.confirm-title {
+  margin: 8px 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.confirm-text {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+.confirm-cancel {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-col);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.confirm-danger {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }
 </style>
