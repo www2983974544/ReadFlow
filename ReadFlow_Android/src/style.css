@@ -964,3 +964,25 @@ body.theme-dark .word-mark-mastered {
 body.reader-immersive #viewReader .reader-body-inner {
   max-width: 100%;
 }
+
+/* ==== 工具栏按钮（复制自桌面 style.css 491-504） ==== */
+.toolbar-pill-btn {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+/* ==== 隐藏类（桌面 style.css 766 行同款，!important 保证压过组件 display 声明） ==== */
+.hidden {
+  display: none !important;
+}
