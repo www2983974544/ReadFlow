@@ -1,0 +1,8 @@
+{
+  "appId": "com.readflow.app",
+  "appName": "ReadFlow",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

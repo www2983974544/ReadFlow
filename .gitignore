@@ -1,0 +1,21 @@
+# ---- dependencies (restorable via npm install / pip install) ----
+node_modules/
+
+# ---- build outputs (rebuildable from source) ----
+dist/
+build/
+.vite/
+__pycache__/
+*.pyc
+
+# ---- packaged deliverables ----
+*.exe
+
+# ---- android build artifacts ----
+ReadFlow_Android/android/.gradle/
+ReadFlow_Android/android/local.properties
+ReadFlow_Android/android/app/build/
+
+# ---- local dev/test data & editor state ----
+.tmp*/
+.zcode/

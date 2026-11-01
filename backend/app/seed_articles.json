@@ -1,0 +1,442 @@
+{
+ "initial": [
+  {
+   "id": "art-econ-ai-work",
+   "title": "Generative AI and the Reshaping of Professional Judgment",
+   "titleCn": "生成式人工智能与职业判断力的重塑",
+   "source": "The Economist",
+   "sourceUrl": "https://www.economist.com",
+   "category": "科技与人工智能",
+   "examLevel": "CET-6",
+   "lexile": "1120L",
+   "cetRatio": "19.4%",
+   "examFreqTag": "🔥 六级仔细阅读高频 · 科技与职场",
+   "inLibrary": true,
+   "readStatus": "reading",
+   "paragraphs": [
+    {
+     "en": "Artificial intelligence is beginning to transform the modern workplace in ways that challenge earlier predictions about automation. For decades, economists assumed that machines would primarily replace routine manual labor while leaving cognitive and creative professions untouched.",
+     "cn": "人工智能正开始以挑战早期自动化预测的方式重塑现代职场。几十年来，经济学家一直认为机器主要会取代常规体力劳动，而不会触及认知型与创造性职业。"
+    },
+    {
+     "en": "However, recent advances in generative algorithms demonstrate that software can now draft reports, summarize complex legal documents, and generate analytical code within seconds. Consequently, white-collar workers are discovering that many of their daily tasks can be delegated to digital assistants.",
+     "cn": "然而，生成式算法的最新进展表明，软件现在可以在几秒钟内起草报告、总结复杂的法律文件并生成分析代码。因此，白领工作者发现他们的许多日常任务都可以委派给数字助手。"
+    },
+    {
+     "en": "Yet skeptical researchers emphasize that increased speed does not automatically guarantee higher productivity. When employees rely too heavily on automated outputs without exercising critical judgment, subtle errors and superficial conclusions can easily spread across an organization. The true competitive advantage in the coming decade will belong to professionals who collaborate with intelligent tools while maintaining deep domain expertise.",
+     "cn": "然而，持怀疑态度的研究人员强调，速度的提升并不自动保证更高的生产率。当员工过度依赖自动化输出而不运用批判性判断时，细微的错误和肤浅的结论很容易在组织内蔓延。未来十年真正的竞争优势将属于那些既能与智能工具协作、又能保持深厚领域专业知识的专业人士。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "When employees rely too heavily on automated outputs without exercising critical judgment, subtle errors and superficial conclusions can easily spread across an organization.",
+    "structure": "【时间状语从句】When employees rely too heavily on automated outputs + 【介词短语作伴随状语】without exercising critical judgment, + 【主句主干】subtle errors and superficial conclusions can easily spread across an organization.",
+    "tip": "四六级阅读定位技巧：句首 When 引导条件/时间背景，介词 without 后往往隐藏作者批评的症结（缺乏批判性判断），主句则直接指出负面后果。"
+   },
+   "quiz": [
+    {
+     "q": "1. What did economists previously assume about automation according to Paragraph 1?",
+     "options": [
+      "A) It would mainly affect routine physical jobs rather than cognitive ones.",
+      "B) It would immediately eliminate all white-collar management positions.",
+      "C) It would reduce the demand for software engineers and legal experts.",
+      "D) It would fail to improve productivity in manufacturing industries."
+     ],
+     "answer": 0,
+     "explanation": "定位第一段末句：economists assumed that machines would primarily replace routine manual labor while leaving cognitive and creative professions untouched（主要取代常规体力劳动，而不触及认知和创意职业），与 A 项同义替换。"
+    },
+    {
+     "q": "2. What is the author's attitude toward relying entirely on automated outputs?",
+     "options": [
+      "A) Enthusiastic and unreservedly supportive.",
+      "B) Cautious and concerned about potential superficial errors.",
+      "C) Indifferent to how companies adopt digital assistants.",
+      "D) Hostile toward any form of technological innovation."
+     ],
+     "answer": 1,
+     "explanation": "定位第三段：When employees rely too heavily on automated outputs without exercising critical judgment, subtle errors and superficial conclusions can easily spread... 说明作者对此持审慎担忧态度（Cautious and concerned）。"
+    }
+   ]
+  },
+  {
+   "id": "art-sciam-sponge-city",
+   "title": "How Sponge Cities Use Nature to Mitigate Urban Flooding",
+   "titleCn": "“海绵城市”如何利用自然生态系统缓解城市洪涝",
+   "source": "Scientific American",
+   "sourceUrl": "https://www.scientificamerican.com",
+   "category": "生态与气候环境",
+   "examLevel": "CET-4",
+   "lexile": "980L",
+   "cetRatio": "17.8%",
+   "examFreqTag": "🌱 四级仔细阅读高频 · 城市生态方案",
+   "inLibrary": true,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Modern urban architecture has traditionally relied on concrete pavements and underground pipes to channel rainwater away as quickly as possible. While this engineering strategy worked in the past, accelerating climate change has brought extreme storms that overwhelm conventional drainage infrastructure.",
+     "cn": "现代城市建筑传统上依赖混凝土地面和地下管道，以最快速度排走雨水。虽然这种工程策略在过去行之有效，但加速的气候变化带来了极端暴雨，使传统排水基础设施不堪重负。"
+    },
+    {
+     "en": "In response, urban planners around the world are embracing the concept of sustainable sponge cities. Instead of sealing the ground with impermeable concrete, cities are restoring wetlands, planting rooftop gardens, and constructing porous sidewalks that absorb substantial amounts of water during heavy rainfall.",
+     "cn": "作为回应，全球城市规划者正在拥抱可持续“海绵城市”的理念。城市不再用不透水的混凝土封闭地面，而是修复湿地、种植屋顶花园并铺设透水人行道，在强降雨期间吸收大量水分。"
+    },
+    {
+     "en": "Beyond preventing destructive floods, these ecological investments offer significant secondary benefits. Stored rainwater can be filtered and reused during dry seasons, while expanded green spaces lower urban temperatures and support local biodiversity with lower long-term maintenance costs.",
+     "cn": "除了防止破坏性洪水外，这些生态投资还带来了显著的附加效益。储存的雨水可以过滤并在旱季重复利用，而扩大的绿地空间能降低城市温度、支持当地生物多样性，且长期维护成本更低。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Instead of sealing the ground with impermeable concrete, cities are restoring wetlands, planting rooftop gardens, and constructing porous sidewalks that absorb substantial amounts of water.",
+    "structure": "【对比状语】Instead of sealing the ground... + 【主句谓语并列结构】cities are restoring..., planting..., and constructing porous sidewalks + 【定语从句】that absorb substantial amounts of water.",
+    "tip": "Instead of A, B 是四六级阅读最核心的对比考点句型，考题常问“新方案与传统做法有何不同”，答案直接定位在主句的三个并列动宾结构。"
+   },
+   "quiz": [
+    {
+     "q": "1. Why are traditional urban drainage systems failing today?",
+     "options": [
+      "A) Concrete pipes have become too expensive for cities to construct.",
+      "B) Extreme storms caused by climate change exceed their capacity.",
+      "C) Underground water supplies have completely dried up in urban areas.",
+      "D) Rooftop gardens are blocking traditional drainage channels."
+     ],
+     "answer": 1,
+     "explanation": "定位第一段末句：accelerating climate change has brought extreme storms that overwhelm conventional drainage infrastructure（气候变化带来的极端风暴超出了传统排水设施负荷）。"
+    },
+    {
+     "q": "2. Which of the following is an additional benefit of sponge cities mentioned in Paragraph 3?",
+     "options": [
+      "A) Eliminating the need for any urban road maintenance.",
+      "B) Increasing the speed of automobile traffic during rainstorms.",
+      "C) Reducing urban heat and enhancing local biodiversity.",
+      "D) Generating renewable electricity from underground pipes."
+     ],
+     "answer": 2,
+     "explanation": "定位第三段末句：expanded green spaces lower urban temperatures and support local biodiversity（降低城市温度并支持当地生物多样性）。"
+    }
+   ]
+  },
+  {
+   "id": "art-guardian-deep-reading",
+   "title": "Digital Fragmentation and the Decline of Deep Reading Comprehension",
+   "titleCn": "数字碎片化与深度阅读理解力的衰退",
+   "source": "The Guardian",
+   "sourceUrl": "https://www.theguardian.com",
+   "category": "心理与教育认知",
+   "examLevel": "CET-6",
+   "lexile": "1150L",
+   "cetRatio": "21.0%",
+   "examFreqTag": "🧠 四六级高频必考 · 阅读认知研究",
+   "inLibrary": true,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Constant exposure to smartphone notifications and short-form digital media is subtly rewiring human attention spans. Neuroscientists warn that the habit of skimming headlines and jumping between hyperlinks encourages superficial information processing at the expense of deep comprehension.",
+     "cn": "持续接触智能手机通知和短平快数字媒体正在潜移默化地重塑人类的注意力时长。神经科学家警告称，浏览标题和在超链接之间跳转的习惯助长了肤浅的信息处理，却牺牲了深度理解能力。"
+    },
+    {
+     "en": "In empirical studies comparing print and screen reading, students who read long-form arguments on paper consistently demonstrated superior recall and analytical insight. Psychologist Maryanne Wolf points out that deep reading is not an innate biological instinct, but a delicate cognitive skill that requires deliberate practice and uninterrupted concentration.",
+     "cn": "在对比纸质阅读与屏幕阅读的实证研究中，在纸上阅读长篇论述的学生始终表现出更出色的记忆力与分析洞察力。心理学家玛丽安·沃尔夫指出，深度阅读并非天生的生物本能，而是一项需要刻意练习和不受干扰的专注才能习得的精密认知技能。"
+    },
+    {
+     "en": "To cultivate mental resilience in a distracted era, educators recommend setting aside dedicated offline intervals each day. Even thirty minutes of slow, reflective engagement with complex texts can rebuild the neural pathways essential for critical thinking.",
+     "cn": "为了在分心时代培养心智韧性，教育工作者建议每天留出专门的离线时段。哪怕每天只花三十分钟慢速、反思性地精读复杂文本，也能重建对批判性思维至关重要的神经通路。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Psychologist Maryanne Wolf points out that deep reading is not an innate biological instinct, but a delicate cognitive skill that requires deliberate practice and uninterrupted concentration.",
+    "structure": "【主句】Psychologist Maryanne Wolf points out + 【宾语从句】that deep reading is not A (an innate biological instinct), but B (a delicate cognitive skill) + 【定语从句修饰 B】that requires deliberate practice...",
+    "tip": "not A, but B（不是A，而是B）是四六级学者观点题的黄金定位点，重点永远在 but 之后的内容。"
+   },
+   "quiz": [
+    {
+     "q": "1. What does neuroscientific research suggest about habitual screen skimming?",
+     "options": [
+      "A) It strengthens the brain's ability to memorize complex vocabulary.",
+      "B) It promotes superficial processing and weakens deep comprehension.",
+      "C) It has no measurable impact on university students' academic performance.",
+      "D) It is an innate biological instinct shared by all human generations."
+     ],
+     "answer": 1,
+     "explanation": "定位第一段第二句：encourages superficial information processing at the expense of deep comprehension。"
+    }
+   ]
+  },
+  {
+   "id": "art-hbr-remote-hybrid",
+   "title": "The Hidden Paradox of Autonomy in Hybrid Work Environments",
+   "titleCn": "混合办公环境中“工作自主权”背后的隐秘悖论",
+   "source": "Harvard Business Review",
+   "sourceUrl": "https://hbr.org",
+   "category": "经济与商业职场",
+   "examLevel": "CET-6",
+   "lexile": "1100L",
+   "cetRatio": "18.2%",
+   "examFreqTag": "💼 六级高频 · 商业管理与职场心理",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Flexible remote work arrangements were widely celebrated for granting employees greater autonomy over their daily schedules. Workers gained the freedom to avoid exhausting commutes and balance domestic responsibilities alongside professional deadlines.",
+     "cn": "灵活的远程办公安排曾因赋予员工对日常日程更大的自主权而广受赞誉。职场人获得了免于疲惫通勤的自由，并能在职业截止日期之余平衡家庭责任。"
+    },
+    {
+     "en": "Paradoxically, however, organizational surveys reveal that blurring the physical boundary between office and home often leads to longer working hours and chronic exhaustion. Without clear collective routines, employees feel compelled to remain constantly available online to prove their motivation and productivity.",
+     "cn": "然而矛盾的是，组织调查显示，模糊办公室与家庭之间的物理边界往往会导致更长的工作时间和慢性疲惫。由于缺乏明确的集体作息惯例，员工感到被迫时刻保持在线，以证明自己的积极性与工作效率。"
+    },
+    {
+     "en": "Effective managers are now shifting their strategy from monitoring online hours to evaluating tangible outcomes. Establishing explicit communication norms—such as banning late-night messages—helps preserve individual autonomy while preventing digital burnout.",
+     "cn": "高效的管理者目前正将策略从监控在线时长转向评估实际成果。建立明确的沟通规范（例如禁止深夜发送工作消息）有助于在保护个人自主权的同时防止数字倦怠。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Without clear collective routines, employees feel compelled to remain constantly available online to prove their motivation and productivity.",
+    "structure": "【条件状语】Without clear collective routines, + 【主干】employees feel compelled to remain constantly available online + 【目的状语】to prove their motivation and productivity.",
+    "tip": "Without 短语表示反面假设条件，feel compelled to do sth（感到被迫做某事）常考因果推断题。"
+   },
+   "quiz": [
+    {
+     "q": "1. Why do many remote workers end up experiencing chronic exhaustion?",
+     "options": [
+      "A) They spend too much time commuting between home and regional offices.",
+      "B) Unclear boundaries pressure them to stay constantly online to show commitment.",
+      "C) Companies have drastically reduced salaries for hybrid employees.",
+      "D) Digital collaboration software is too difficult for employees to master."
+     ],
+     "answer": 1,
+     "explanation": "定位第二段：blurring the physical boundary... employees feel compelled to remain constantly available online to prove their motivation and productivity。"
+    }
+   ]
+  },
+  {
+   "id": "art-npr-sleep-deficit",
+   "title": "Why Weekend Catch-Up Sleep Cannot Fully Compensate for Chronic Sleep Deficit",
+   "titleCn": "为什么周末补觉无法完全弥补长期的睡眠赤字",
+   "source": "NPR Health",
+   "sourceUrl": "https://www.npr.org",
+   "category": "社会文化与健康",
+   "examLevel": "CET-4",
+   "lexile": "960L",
+   "cetRatio": "16.9%",
+   "examFreqTag": "🏥 四级仔细阅读高频 · 健康与生命科学",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Many students and young professionals sacrifice sleep during the workweek under the assumption that sleeping late on weekends will restore their energy. While extra rest on Saturday morning may temporarily reduce feelings of fatigue, clinical sleep studies tell a more cautionary story.",
+     "cn": "许多学生和年轻职场人在工作日牺牲睡眠，以为周末睡懒觉就能恢复精力。虽然周六早上多睡会儿能暂时减轻疲劳感，但临床睡眠研究却给出了更具警示性的结论。"
+    },
+    {
+     "en": "Researchers monitoring human metabolism found that five consecutive nights of sleep deprivation significantly disrupt blood sugar regulation and weaken the immune system. Even when participants were allowed unlimited recovery sleep over the weekend, their metabolic efficiency and attention levels remained below normal on Monday morning.",
+     "cn": "监测人体新陈代谢的研究人员发现，连续五晚睡眠剥夺会显著扰乱血糖调节并削弱免疫系统。即使允许参与者在周末无限量补觉，他们在周一早上的代谢效率和注意力水平仍然低于正常值。"
+    },
+    {
+     "en": "Sleep scientists emphasize that the internal biological clock thrives on consistency rather than dramatic fluctuations. Maintaining a regular bedtime schedule throughout the week is essential for long-term cognitive performance and physical resilience.",
+     "cn": "睡眠科学家强调，人体内部生物钟依赖规律性，而非剧烈波动。在整个星期内保持规律的就寝时间，对于长期的认知表现和身体韧性至关重要。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Researchers monitoring human metabolism found that five consecutive nights of sleep deprivation significantly disrupt blood sugar regulation and weaken the immune system.",
+    "structure": "【主语+现在分词后置定语】Researchers (monitoring human metabolism) + 【谓语】found + 【宾语从句】that five consecutive nights of sleep deprivation significantly disrupt... and weaken...",
+    "tip": "Researchers found that... 是四六级健康科普文最经典的实验结论信号词，后面的宾语从句往往直接对应考题正确选项。"
+   },
+   "quiz": [
+    {
+     "q": "1. What did clinical studies reveal about weekend recovery sleep?",
+     "options": [
+      "A) It completely reverses all metabolic damage caused during the week.",
+      "B) It fails to fully restore metabolic efficiency and attention to normal levels.",
+      "C) It causes permanent damage to the human immune system.",
+      "D) It is more beneficial than maintaining a consistent daily bedtime."
+     ],
+     "answer": 1,
+     "explanation": "定位第二段末句：their metabolic efficiency and attention levels remained below normal on Monday morning（代谢效率和注意力仍低于正常水平）。"
+    }
+   ]
+  },
+  {
+   "id": "art-econ-small-indulgence",
+   "title": "The Lipstick Effect: Why Consumers Buy Small Luxuries During Inflation",
+   "titleCn": "“口红效应”：为何消费者在通胀时期热衷购买小件奢侈品",
+   "source": "The Economist",
+   "sourceUrl": "https://www.economist.com",
+   "category": "经济与商业职场",
+   "examLevel": "CET-4",
+   "lexile": "1010L",
+   "cetRatio": "17.5%",
+   "examFreqTag": "💼 四级高频 · 消费经济学现象",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "When inflation erodes household purchasing power, consumers naturally postpone major financial commitments such as buying houses, luxury cars, or overseas vacations. Yet retail data consistently reveals a fascinating economic phenomenon known as the lipstick effect.",
+     "cn": "当通货膨胀侵蚀家庭购买力时，消费者自然会推迟买房、豪车或海外度假等重大财务支出。然而，零售数据却一贯揭示出一种被称为“口红效应”的迷人经济现象。"
+    },
+    {
+     "en": "Instead of eliminating all non-essential spending, budget-conscious shoppers treat themselves to affordable indulgences—such as specialty coffee, premium cosmetics, or artisan chocolates. Behavioral economists explain that these modest purchases provide an immediate emotional boost without threatening long-term financial security.",
+     "cn": "精打细算的消费者并没有砍掉所有非必要开支，而是会犒劳自己一些买得起的小确幸商品——比如精品咖啡、高端美妆或手工巧克力。行为经济学家解释说，这些小额消费能带来即时的情绪提振，同时又不会威胁长期的财务安全。"
+    },
+    {
+     "en": "Brands that position their products as accessible everyday rewards often outperform competitors during economic slowdowns. Understanding consumer perception of value is therefore just as important as cutting production costs.",
+     "cn": "在经济放缓时期，将产品定位为“触手可及的日常犒赏”的品牌往往比竞争对手表现更出色。因此，理解消费者对价值的感知与削减生产成本同样重要。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Behavioral economists explain that these modest purchases provide an immediate emotional boost without threatening long-term financial security.",
+    "structure": "【主句】Behavioral economists explain + 【宾语从句】that these modest purchases provide an immediate emotional boost + 【方式状语】without threatening long-term financial security.",
+    "tip": "理解“小额消费（modest purchases）”为何受欢迎的两个核心原因：一是提供即时情绪补偿（emotional boost），二是不威胁财务安全。"
+   },
+   "quiz": [
+    {
+     "q": "1. What is the 'lipstick effect' described in the passage?",
+     "options": [
+      "A) Consumers spending more on small affordable treats when avoiding big-ticket purchases.",
+      "B) Cosmetic companies raising their prices sharply during periods of high inflation.",
+      "C) Households saving all their income and refusing to buy any non-essential goods.",
+      "D) Luxury automobile brands shifting their business toward beauty products."
+     ],
+     "answer": 0,
+     "explanation": "定位第一、二段：推迟大额消费的同时，购买负担得起的小型享受型商品（affordable indulgences）。"
+    }
+   ]
+  }
+ ],
+ "extra": [
+  {
+   "id": "art-nature-microplastics",
+   "title": "Tracing Microplastic Pollution Across Global Marine Ecosystems",
+   "titleCn": "追踪全球海洋生态系统中的微塑料污染路径",
+   "source": "Nature",
+   "sourceUrl": "https://www.nature.com",
+   "category": "生态与气候环境",
+   "examLevel": "CET-6",
+   "lexile": "1160L",
+   "cetRatio": "20.2%",
+   "examFreqTag": "🌱 六级高频 · 海洋生态与环境科学",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Microscopic plastic fragments have infiltrated nearly every corner of the global ocean, from coastal ecosystems to the deepest marine trenches. These invisible pollutants originate from synthetic textiles, industrial manufacturing, and the gradual fragmentation of larger plastic waste.",
+     "cn": "微小的塑料碎片已经渗透到全球海洋的几乎每一个角落，从沿海生态系统到最深的海沟。这些肉眼难见的污染物源于合成纺织品、工业制造以及大型塑料垃圾的逐渐碎裂。"
+    },
+    {
+     "en": "Marine biologists warn that planktons and small fish frequently mistake microplastics for nutritious food particles. Once ingested, toxic chemicals accumulate along the food chain, posing potential consequences for marine biodiversity and human health.",
+     "cn": "海洋生物学家警告说，浮游生物和小型鱼类经常将微塑料误认为有营养的食物颗粒。一旦被摄入，有毒化学物质就会沿着食物链富集，对海洋生物多样性和人类健康构成潜在后果。"
+    },
+    {
+     "en": "Addressing this ecological crisis requires both innovative biodegradable materials and stricter international regulations on industrial emissions. Without coordinated intervention, marine plastic concentration is projected to accelerate significantly over the next decade.",
+     "cn": "应对这一生态危机既需要创新的可生物降解材料，也需要对工业排放实施更严格的国际监管。如果缺乏协同干预，预计未来十年海洋塑料浓度将显著加速上升。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Once ingested, toxic chemicals accumulate along the food chain, posing potential consequences for marine biodiversity and human health.",
+    "structure": "【过去分词状语从句省略】Once (they are) ingested, + 【主句】toxic chemicals accumulate along the food chain, + 【现在分词结果状语】posing potential consequences for...",
+    "tip": "Once + 过去分词（一旦被…）后接主句，句尾 v-ing 补充说明由此引发的连锁结果。"
+   },
+   "quiz": [
+    {
+     "q": "1. How do microplastics enter the marine food chain according to Paragraph 2?",
+     "options": [
+      "A) Small marine organisms accidentally consume them as food.",
+      "B) Deep-sea volcanoes release synthetic particles into the water.",
+      "C) Biodegradable materials dissolve into toxic gases.",
+      "D) Coastal wetlands absorb and multiply plastic fragments."
+     ],
+     "answer": 0,
+     "explanation": "定位第二段首句：planktons and small fish frequently mistake microplastics for nutritious food particles（误将其当作食物颗粒摄入）。"
+    }
+   ]
+  },
+  {
+   "id": "art-atlantic-curiosity-edu",
+   "title": "Why Cultivating Intellectual Curiosity Matters More Than Standardized Testing",
+   "titleCn": "为什么培养求知好奇心比标准化考试更重要",
+   "source": "The Atlantic",
+   "sourceUrl": "https://www.theatlantic.com",
+   "category": "心理与教育认知",
+   "examLevel": "CET-4",
+   "lexile": "990L",
+   "cetRatio": "18.6%",
+   "examFreqTag": "🧠 四级高频 · 教育改革与学习动机",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Modern school curricula often prioritize standardized test scores over genuine intellectual exploration. While frequent examinations measure short-term memory, educational psychologists argue that excessive pressure can undermine students' intrinsic motivation to learn.",
+     "cn": "现代学校课程往往把标准化考试分数置于真正的知识探索之上。虽然频繁的考试能衡量短期记忆，但教育心理学家认为，过度的压力会削弱学生内在的学习动机。"
+    },
+    {
+     "en": "Longitudinal studies indicate that curiosity is a powerful predictor of long-term academic and professional achievement. When students are encouraged to ask open-ended questions and investigate unfamiliar phenomena, they develop stronger analytical comprehension and creative problem-solving skills.",
+     "cn": "纵向研究表明，好奇心是长期学业和职业成就的有力预测指标。当鼓励学生提出开放式问题并探究未知现象时，他们能发展出更强的分析理解力和创造性解决问题的能力。"
+    },
+    {
+     "en": "Reforming classroom instruction does not require abandoning rigorous standards. Instead, teachers can integrate project-based inquiry into the curriculum so that rigorous knowledge acquisition and personal curiosity reinforce each other.",
+     "cn": "改革课堂教学并不需要放弃严格的标准。相反，教师可以将项目式探究融入课程体系，使扎实的知识获取与个人好奇心相辅相成。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "When students are encouraged to ask open-ended questions and investigate unfamiliar phenomena, they develop stronger analytical comprehension and creative problem-solving skills.",
+    "structure": "【时间/条件状语从句】When students are encouraged to ask... and investigate..., + 【主句】they develop stronger analytical comprehension and creative problem-solving skills.",
+    "tip": "教育类文章高频结论句：鼓励主动探究（open-ended questions）带来深层能力提升。"
+   },
+   "quiz": [
+    {
+     "q": "1. What is the main drawback of overemphasizing standardized testing according to the passage?",
+     "options": [
+      "A) It makes school curricula too easy for high-achieving students.",
+      "B) It can weaken students' internal motivation and natural curiosity.",
+      "C) It prevents teachers from grading homework on time.",
+      "D) It costs universities too much financial investment."
+     ],
+     "answer": 1,
+     "explanation": "定位第一段末句：excessive pressure can undermine students' intrinsic motivation to learn。"
+    }
+   ]
+  },
+  {
+   "id": "art-bbc-renewable-grid",
+   "title": "Battery Storage Breakthroughs Accelerate the Transition to Renewable Energy",
+   "titleCn": "电池储能技术突破加速向可再生能源转型",
+   "source": "BBC Future",
+   "sourceUrl": "https://www.bbc.com/future",
+   "category": "科技与人工智能",
+   "examLevel": "CET-4",
+   "lexile": "1020L",
+   "cetRatio": "19.1%",
+   "examFreqTag": "🤖 四六级高频 · 清洁能源与工程创新",
+   "inLibrary": false,
+   "readStatus": "unread",
+   "paragraphs": [
+    {
+     "en": "Solar panels and wind turbines now generate electricity at record-low costs, yet their intermittent nature remains a major challenge for national power grids. Because sunlight and wind fluctuate with weather conditions, energy supply does not always match peak consumer demand.",
+     "cn": "太阳能电池板和风力涡轮机如今以创纪录的低成本发电，但它们的间歇性特征仍然是国家电网面临的主要挑战。由于阳光和风力随天气条件波动，能源供应并不总是与消费者的用电高峰需求相匹配。"
+    },
+    {
+     "en": "Recent breakthroughs in grid-scale battery infrastructure are solving this bottleneck. Innovative sodium-ion and solid-state batteries can store substantial amounts of surplus electricity during sunny afternoons and release it reliably after sunset.",
+     "cn": "电网级电池基础设施的最新突破正在解决这一瓶颈。创新的钠离子和固态电池可以在阳光充足的下午储存大量富余电力，并在日落后可靠地释放出来。"
+    },
+    {
+     "en": "As battery manufacturing efficiency improves, reliance on fossil fuel backup plants is becoming less inevitable. Energy economists predict that integrated storage networks will form the backbone of sustainable electricity generation worldwide.",
+     "cn": "随着电池制造效率的提升，对化石燃料备用电厂的依赖正变得不再那么不可避免。能源经济学家预测，综合储能网络将成为全球可持续发电的支柱。"
+    }
+   ],
+   "complexSentence": {
+    "sentence": "Because sunlight and wind fluctuate with weather conditions, energy supply does not always match peak consumer demand.",
+    "structure": "【原因状语从句】Because sunlight and wind fluctuate with weather conditions, + 【主句】energy supply does not always match peak consumer demand.",
+    "tip": "解释新能源痛点（intermittent 间歇性）的核心因果句，常考细节原因题。"
+   },
+   "quiz": [
+    {
+     "q": "1. What problem do grid-scale batteries help solve for renewable energy?",
+     "options": [
+      "A) They prevent solar panels from overheating in summer.",
+      "B) They store surplus power to balance fluctuating weather supply and consumer demand.",
+      "C) They replace all underground electrical cables in urban areas.",
+      "D) They increase the wind speed around coastal turbines."
+     ],
+     "answer": 1,
+     "explanation": "定位第二段：store substantial amounts of surplus electricity during sunny afternoons and release it reliably after sunset。"
+    }
+   ]
+  }
+ ]
+}
