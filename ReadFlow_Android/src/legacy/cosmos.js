@@ -1,10 +1,16 @@
 // Verbatim port of the legacy cosmos canvas engine (cet_reading_master.html
 // L2957-3355 + L3356-3397). Plain .js on purpose: excluded from type checking.
+// 移动版改动：① 模块级初始化守卫（防止重复进入首页堆叠 RAF 循环）；
+// ② 触屏桥接（touchmove → 合成 mousemove，驱动星环 3D 倾角与星尘尾迹）。
 import { S } from './state'
+
+let cosmosBooted = false
 
 function initCosmosStarfieldCanvas() {
       const canvas = document.getElementById("cosmosStarfieldCanvas");
       if (!canvas) return;
+      if (cosmosBooted) return; // 移动版守卫：RAF 循环只启动一次
+      cosmosBooted = true;
       const ctx = canvas.getContext("2d");
       let width = 0;
       let height = 0;
@@ -61,6 +67,24 @@ function initCosmosStarfieldCanvas() {
           if (ringEl) {
             ringEl.style.transform = "perspective(1100px) rotateX(0deg) rotateY(0deg) scale(1)";
           }
+        });
+
+        // 移动版：触屏 → 合成鼠标事件（3D 倾角 + 星尘尾迹在手机上同样生效）
+        const fireSyntheticMouseMove = (touch) => {
+          heroWrap.dispatchEvent(new MouseEvent("mousemove", {
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            bubbles: true,
+          }));
+        };
+        heroWrap.addEventListener("touchstart", (e) => {
+          if (e.touches[0]) fireSyntheticMouseMove(e.touches[0]);
+        }, { passive: true });
+        heroWrap.addEventListener("touchmove", (e) => {
+          if (e.touches[0]) fireSyntheticMouseMove(e.touches[0]);
+        }, { passive: true });
+        heroWrap.addEventListener("touchend", () => {
+          heroWrap.dispatchEvent(new MouseEvent("mouseleave"));
         });
       }
 

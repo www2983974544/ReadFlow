@@ -295,3 +295,672 @@ body.theme-dark .word-mark-mastered {
   font-size: 13px;
   line-height: 1.7;
 }
+
+
+/* ==== 以下样式块复制自桌面 frontend/src/style.css@v2.1 ==== */
+
+/* ---- 三主题 Tailwind 工具类覆盖（sepia/dark）---- */
+    /* Deep Theme Overrides for ALL inner sub-modules in Sepia & Dark Modes */
+    body.theme-sepia select,
+    body.theme-sepia input,
+    body.theme-sepia textarea {
+      background-color: var(--bg-input) !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-col) !important;
+    }
+    body.theme-sepia .bg-white,
+    body.theme-sepia .bg-slate-50,
+    body.theme-sepia .bg-slate-50\/80,
+    body.theme-sepia .bg-slate-50\/90,
+    body.theme-sepia .bg-slate-100,
+    body.theme-sepia .bg-slate-100\/80,
+    body.theme-sepia .bg-slate-100\/90 {
+      background-color: var(--bg-subcard) !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-col) !important;
+    }
+    body.theme-sepia .bg-indigo-50,
+    body.theme-sepia .bg-indigo-50\/50,
+    body.theme-sepia .bg-indigo-50\/70,
+    body.theme-sepia .bg-indigo-50\/80 {
+      background-color: #ebe0cc !important;
+      color: #3d2c1d !important;
+      border-color: #d1bfa1 !important;
+    }
+    body.theme-sepia .bg-amber-50,
+    body.theme-sepia .bg-amber-50\/60,
+    body.theme-sepia .bg-amber-50\/70,
+    body.theme-sepia .bg-amber-100\/60 {
+      background-color: #f2e3c6 !important;
+      color: #5c3409 !important;
+      border-color: #d9be8b !important;
+    }
+    body.theme-sepia .bg-violet-50,
+    body.theme-sepia .bg-violet-50\/60 {
+      background-color: #ebe0d0 !important;
+      color: #3b2a1e !important;
+      border-color: #cfbda4 !important;
+    }
+    body.theme-sepia .bg-emerald-50,
+    body.theme-sepia .bg-emerald-50\/70,
+    body.theme-sepia .bg-emerald-50\/80 {
+      background-color: #dfe8d5 !important;
+      color: #1c4527 !important;
+      border-color: #b7cca4 !important;
+    }
+    body.theme-sepia .bg-rose-50,
+    body.theme-sepia .bg-rose-50\/70 {
+      background-color: #f0dcd8 !important;
+      color: #6e1c26 !important;
+      border-color: #d9b2ab !important;
+    }
+    body.theme-sepia .border-slate-200,
+    body.theme-sepia .border-slate-200\/70,
+    body.theme-sepia .border-slate-200\/80,
+    body.theme-sepia .border-slate-300 {
+      border-color: var(--border-col) !important;
+    }
+    body.theme-sepia .text-slate-600,
+    body.theme-sepia .text-slate-700,
+    body.theme-sepia .text-slate-800,
+    body.theme-sepia .text-indigo-950 {
+      color: var(--text-secondary) !important;
+    }
+
+    body.theme-dark select,
+    body.theme-dark input,
+    body.theme-dark textarea {
+      background-color: var(--bg-input) !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-col) !important;
+    }
+    body.theme-dark .bg-white,
+    body.theme-dark .bg-slate-50,
+    body.theme-dark .bg-slate-50\/80,
+    body.theme-dark .bg-slate-50\/90,
+    body.theme-dark .bg-slate-100,
+    body.theme-dark .bg-slate-100\/80,
+    body.theme-dark .bg-slate-100\/90 {
+      background-color: var(--bg-subcard) !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-col) !important;
+    }
+    body.theme-dark .bg-indigo-50,
+    body.theme-dark .bg-indigo-50\/50,
+    body.theme-dark .bg-indigo-50\/70,
+    body.theme-dark .bg-indigo-50\/80 {
+      background-color: rgba(79, 70, 229, 0.18) !important;
+      color: #c7d2fe !important;
+      border-color: rgba(99, 102, 241, 0.35) !important;
+    }
+    body.theme-dark .bg-amber-50,
+    body.theme-dark .bg-amber-50\/60,
+    body.theme-dark .bg-amber-50\/70,
+    body.theme-dark .bg-amber-100,
+    body.theme-dark .bg-amber-100\/60 {
+      background-color: rgba(245, 158, 11, 0.16) !important;
+      color: #fde68a !important;
+      border-color: rgba(245, 158, 11, 0.35) !important;
+    }
+    body.theme-dark .bg-violet-50,
+    body.theme-dark .bg-violet-50\/60,
+    body.theme-dark .bg-violet-100 {
+      background-color: rgba(139, 92, 246, 0.18) !important;
+      color: #ddd6fe !important;
+      border-color: rgba(139, 92, 246, 0.35) !important;
+    }
+    body.theme-dark .bg-emerald-50,
+    body.theme-dark .bg-emerald-50\/70,
+    body.theme-dark .bg-emerald-50\/80,
+    body.theme-dark .bg-emerald-100 {
+      background-color: rgba(16, 185, 129, 0.16) !important;
+      color: #a7f3d0 !important;
+      border-color: rgba(16, 185, 129, 0.35) !important;
+    }
+    body.theme-dark .bg-rose-50,
+    body.theme-dark .bg-rose-50\/70,
+    body.theme-dark .bg-rose-100 {
+      background-color: rgba(244, 63, 94, 0.18) !important;
+      color: #fecdd3 !important;
+      border-color: rgba(244, 63, 94, 0.35) !important;
+    }
+    body.theme-dark .border-slate-200,
+    body.theme-dark .border-slate-200\/70,
+    body.theme-dark .border-slate-200\/80,
+    body.theme-dark .border-slate-300,
+    body.theme-dark .border-indigo-100,
+    body.theme-dark .border-indigo-200,
+    body.theme-dark .border-amber-200,
+    body.theme-dark .border-amber-300,
+    body.theme-dark .border-violet-200\/70,
+    body.theme-dark .border-emerald-200,
+    body.theme-dark .border-rose-200 {
+      border-color: var(--border-col) !important;
+    }
+    body.theme-dark .text-slate-500,
+    body.theme-dark .text-slate-600,
+    body.theme-dark .text-slate-700,
+    body.theme-dark .text-slate-800,
+    body.theme-dark .text-slate-900,
+    body.theme-dark .text-indigo-900,
+    body.theme-dark .text-indigo-950 {
+      color: var(--text-main) !important;
+    }
+    body.theme-dark .text-indigo-600,
+    body.theme-dark .text-indigo-700,
+    body.theme-dark .text-indigo-800 {
+      color: #a5b4fc !important;
+    }
+    body.theme-dark .text-amber-700,
+    body.theme-dark .text-amber-800,
+    body.theme-dark .text-amber-900 {
+      color: #fcd34d !important;
+    }
+    body.theme-dark .text-emerald-600,
+    body.theme-dark .text-emerald-700,
+    body.theme-dark .text-emerald-800,
+    body.theme-dark .text-emerald-900 {
+      color: #6ee7b7 !important;
+    }
+    body.theme-dark .text-rose-600,
+    body.theme-dark .text-rose-700,
+    body.theme-dark .text-rose-800,
+    body.theme-dark .text-rose-900 {
+      color: #fda4af !important;
+    }
+    body.theme-dark .text-violet-700,
+    body.theme-dark .text-violet-800 {
+      color: #c4b5fd !important;
+    }
+    body.theme-dark .hover\:bg-slate-100:hover,
+    body.theme-dark .hover\:bg-slate-200:hover,
+    body.theme-dark .hover\:bg-slate-50\/70:hover {
+      background-color: var(--bg-elevated) !important;
+    }
+
+/* ---- 星空宇宙 + 蓝宝石星环首页 ---- */
+    /* ==========================================================================
+       NEW FEATURE #1 (v1.1): HAUTE-HORLOGERIE SAPPHIRE ORBITAL RING & COSMOS
+       ========================================================================== */
+    .cosmos-hero-card {
+      position: relative;
+      min-height: calc(100vh - 84px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 26px;
+      background: #010206;
+      color: #f8fafc;
+      border: 1px solid rgba(125, 211, 252, 0.24);
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        inset 0 0 140px rgba(14, 165, 233, 0.14);
+      overflow: hidden;
+      perspective: 1200px;
+    }
+    #cosmosStarfieldCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cosmos-vignette-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 48%, transparent 32%, rgba(1, 3, 10, 0.48) 78%, rgba(1, 2, 6, 0.9) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .readflow-neon-title {
+      font-size: clamp(2.0rem, 3.6vw, 3.1rem);
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      padding-left: 0.28em;
+      text-transform: uppercase;
+      line-height: 1.05;
+      background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 45%, #7dd3fc 82%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.42));
+    }
+    .luxury-orbital-ring-trigger {
+      position: relative;
+      width: min(446px, 82vw);
+      height: min(446px, 82vw);
+      margin: 0 auto;
+      cursor: pointer;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transition: transform 0.18s ease-out, filter 0.45s ease;
+      filter: drop-shadow(0 0 54px rgba(14, 165, 233, 0.26));
+    }
+    .luxury-orbital-ring-trigger:hover {
+      filter: drop-shadow(0 0 78px rgba(56, 189, 248, 0.55));
+    }
+    /* Sapphire Crystal Lens Core */
+    .luxury-orbital-ring-trigger::before {
+      content: "";
+      position: absolute;
+      inset: 14.5%;
+      border-radius: 9999px;
+      background:
+        radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(6, 14, 34, 0.46) 0%, rgba(2, 6, 18, 0.74) 76%, rgba(14, 165, 233, 0.08) 100%);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.22),
+        inset 0 0 42px rgba(56, 189, 248, 0.12),
+        0 0 60px rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(8px) saturate(140%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Ambient Conic Aurora Halo behind the Sapphire Lens */
+    .luxury-orbital-ring-trigger::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 9999px;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(56, 189, 248, 0.14) 60deg,
+        rgba(129, 140, 248, 0.18) 120deg,
+        transparent 180deg,
+        rgba(232, 121, 249, 0.12) 240deg,
+        rgba(52, 211, 153, 0.12) 300deg,
+        transparent 360deg
+      );
+      filter: blur(22px);
+      animation: spinOrbitSlow 28s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes spinOrbitSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinOrbitReverse {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes shimmerSweep {
+      0% { transform: translateX(-120%) skewX(-20deg); }
+      100% { transform: translateX(220%) skewX(-20deg); }
+    }
+    .orbit-spin-cw {
+      transform-origin: 230px 230px;
+      animation: spinOrbitSlow 80s linear infinite;
+    }
+    .orbit-spin-ccw {
+      transform-origin: 230px 230px;
+      animation: spinOrbitReverse 52s linear infinite;
+    }
+    .ring-center-hud {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      user-select: none;
+      transform: translateZ(24px);
+    }
+    .hero-days-number {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(4.5rem, 7.6vw, 6.2rem);
+      font-weight: 200;
+      letter-spacing: -0.045em;
+      line-height: 0.92;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 30%, #bae6fd 72%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 28px rgba(56, 189, 248, 0.52));
+    }
+    .sapphire-hms-capsule {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 12px;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.58) 0%, rgba(2, 6, 23, 0.78) 100%);
+      border: 1px solid rgba(186, 230, 253, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    .sub-hms-unit {
+      display: flex;
+      align-items: baseline;
+      gap: 3.5px;
+    }
+    .sub-hms-val {
+      font-family: 'Inter', "Segoe UI", Consolas, monospace;
+      font-size: clamp(1.18rem, 1.95vw, 1.42rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+      text-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+      font-variant-numeric: tabular-nums;
+    }
+    .sub-hms-lbl {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: rgba(125, 211, 252, 0.75);
+      text-transform: uppercase;
+    }
+    .sub-hms-sep {
+      font-size: 11px;
+      color: rgba(56, 189, 248, 0.42);
+      font-weight: 400;
+    }
+    .enter-reader-cta-pill {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 22px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.22) 0%, rgba(99, 102, 241, 0.28) 100%);
+      border: 1px solid rgba(125, 211, 252, 0.42);
+      color: #e0f2fe;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      cursor: pointer;
+      box-shadow: 0 0 28px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: all 0.25s ease;
+    }
+    .enter-reader-cta-pill:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.38) 0%, rgba(99, 102, 241, 0.45) 100%);
+      border-color: #7dd3fc;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 38px rgba(56, 189, 248, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    .enter-reader-cta-pill::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 45%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+      animation: shimmerSweep 4.2s infinite;
+    }
+
+/* ---- v1.1 精读页/获取页 UI 重构（作用域限定）---- */
+    /* ==========================================================================
+       v1.1 READER UI REFACTOR — scoped to #viewReader only (other pages untouched)
+       ========================================================================== */
+
+    /* --- Theme palette refinement (plan §4), reader-scoped --- */
+    #viewReader {
+      --bg-main: #f8fafc;
+      --border-col: rgba(15, 23, 42, 0.08);
+      background-color: var(--bg-main);
+    }
+    body.theme-sepia #viewReader {
+      --bg-main: #efe6d5;
+      --bg-card: #f8f1e3;
+      --bg-reader: #fcf8f0;
+      --bg-subcard: #ebe0cc;
+      --border-col: rgba(67, 46, 26, 0.12);
+    }
+    body.theme-dark #viewReader {
+      --border-col: rgba(148, 163, 184, 0.14);
+    }
+
+    /* --- Toolbar: lighter frame, ghost buttons, grouped control slots --- */
+    #viewReader .reader-toolbar-card {
+      padding: 6px 10px;
+      gap: 6px;
+    }
+    #viewReader .ghost-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.15s ease;
+    }
+    #viewReader .ghost-btn:hover {
+      background: var(--bg-elevated);
+    }
+    #viewReader .reader-control-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: var(--bg-subcard);
+      border-radius: 10px;
+      padding: 2px 4px;
+    }
+    #viewReader .slot-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border-col);
+      margin: 0 3px;
+      flex: 0 0 1px;
+    }
+    #viewReader .ghost-select {
+      background: transparent;
+      border: none;
+      font-size: 11.5px;
+      height: 26px;
+      color: var(--text-secondary);
+      padding: 0 2px;
+      outline: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* --- Editorial masthead --- */
+    #viewReader .reader-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+    }
+    #viewReader .reader-meta-line {
+      color: var(--text-muted);
+    }
+    #viewReader .reader-body-inner {
+      max-width: min(76ch, 100%);
+      margin-inline: auto;
+    }
+    /* 宽屏沉浸模式：两侧栏收起时正文放宽一档（仍处健康行长区间） */
+    body.reader-immersive #viewReader .reader-body-inner {
+      max-width: min(88ch, 100%);
+    }
+
+    /* --- Left sidebar: filter drawer + pinned stat strip --- */
+    #viewReader .reader-filter-drawer {
+      border: 1px solid var(--border-col);
+      border-radius: 10px;
+      background: var(--bg-subcard);
+    }
+    #viewReader .reader-filter-drawer summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    #viewReader .reader-filter-drawer summary::-webkit-details-marker { display: none; }
+    #viewReader .reader-filter-drawer summary::after {
+      content: "▸";
+      margin-left: auto;
+      color: var(--text-muted);
+      transition: transform 0.15s ease;
+    }
+    #viewReader .reader-filter-drawer[open] summary::after { transform: rotate(90deg); }
+    #viewReader .reader-filter-drawer[open] summary {
+      border-bottom: 1px solid var(--border-col);
+    }
+    #viewReader .reader-filter-drawer > div { padding: 0 10px; }
+    #viewReader .reader-stat-strip {
+      border-radius: 12px;
+      flex: 0 0 auto;
+    }
+
+    /* --- Bottom collapsible study sections --- */
+    #viewReader .reader-details {
+      border: 1px solid var(--border-col);
+      border-radius: 12px;
+      background: var(--bg-subcard);
+      overflow: hidden;
+    }
+    #viewReader .reader-details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    #viewReader .reader-details summary::-webkit-details-marker { display: none; }
+    #viewReader .reader-details summary::after {
+      content: "▸";
+      margin-left: auto;
+      color: var(--text-muted);
+      transition: transform 0.15s ease;
+    }
+    #viewReader .reader-details[open] summary::after { transform: rotate(90deg); }
+    #viewReader .reader-details[open] summary {
+      border-bottom: 1px solid var(--border-col);
+    }
+    #viewReader .reader-details .details-body { padding: 12px 14px; }
+    #viewReader #readerSentenceAnalysis {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    /* --- Right inspector: tab bar + word facts list --- */
+    #viewReader .inspector-tab-btn {
+      padding: 9px 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    }
+    #viewReader .inspector-tab-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-elevated);
+    }
+    #viewReader .inspector-tab-btn.inspector-tab-active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+    body.theme-sepia #viewReader .inspector-tab-btn.inspector-tab-active {
+      color: #92400e;
+      border-bottom-color: #92400e;
+    }
+    body.theme-dark #viewReader .inspector-tab-btn.inspector-tab-active {
+      color: #a5b4fc;
+      border-bottom-color: #a5b4fc;
+    }
+    #viewReader .reader-word-facts { margin: 0; }
+    #viewReader .reader-word-facts .fact-row {
+      padding: 8px 0;
+    }
+    #viewReader .reader-word-facts .fact-row + .fact-row {
+      border-top: 1px dashed var(--border-col);
+    }
+    #viewReader .reader-word-facts dt {
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-size: 11.5px;
+    }
+    #viewReader .reader-word-facts dd {
+      margin: 0;
+      line-height: 1.55;
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       v1.1 CRAWLER UI REFACTOR — scoped to #viewCrawler
+       ========================================================================== */
+    #viewCrawler .crawl-filter-select,
+    #viewLibrary .crawl-filter-select {
+      height: 32px;
+      font-size: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-col);
+      background: var(--bg-card);
+      color: var(--text-main);
+      padding: 0 8px;
+      outline: none;
+      max-width: 250px;
+      cursor: pointer;
+    }
+    #viewCrawler .crawl-filter-select:focus,
+    #viewLibrary .crawl-filter-select:focus {
+      border-color: #818cf8;
+    }
+    #viewCrawler .crawl-log-drawer summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 12px;
+      opacity: 0.65;
+      display: inline-flex;
+      align-items: center;
+      user-select: none;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: opacity 0.15s ease, background-color 0.15s ease;
+    }
+    #viewCrawler .crawl-log-drawer summary:hover {
+      opacity: 1;
+      background: var(--bg-elevated);
+    }
+    #viewCrawler .crawl-log-drawer summary::-webkit-details-marker { display: none; }
+    #viewCrawler .crawl-log-panel {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #090d16;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+/* ==== 移动端覆盖（Android 版新增）==== */
+.cosmos-hero-card {
+  /* 手机上星空卡片填满视口（vh 兜底 + dvh 精确） */
+  min-height: calc(100vh - var(--header-h) - var(--tabbar-h) - 34px);
+  min-height: calc(100dvh - var(--header-h) - var(--tabbar-h) - 34px);
+  border-radius: 20px;
+}
+/* 精读页正文在手机上单栏全宽（桌面 76ch 轴不适用） */
+#viewReader .reader-body-inner {
+  max-width: 100%;
+}
+body.reader-immersive #viewReader .reader-body-inner {
+  max-width: 100%;
+}
