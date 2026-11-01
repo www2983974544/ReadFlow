@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { S } from '../legacy/state'
 import { applySidebarCollapseLayout, renderStatsIfVisible, showToast, updateTopBadgesAndStats } from '../legacy/ui-fns'
 import {
@@ -26,6 +26,62 @@ import { useStatsStore } from '../stores/stats'
 import { useUiStore } from '../stores/ui'
 
 const ui = useUiStore()
+
+// ---- 划词翻译气泡（v1.1 触屏优化）：选中 ≥2 个英文词后浮出，点按直达翻译台 ----
+const selBubble = ref<{ x: number; y: number; text: string } | null>(null)
+let selDebounce = 0
+
+function refreshSelBubble() {
+  const sel = window.getSelection()
+  const text = (sel?.toString() || '').trim()
+  if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+    selBubble.value = null
+    return
+  }
+  const words = text.split(/\s+/).filter(Boolean)
+  if (words.length < 2 || text.length > 600) {
+    selBubble.value = null
+    return
+  }
+  const anchor = sel.anchorNode
+  const anchorEl =
+    anchor && typeof anchor === 'object'
+      ? anchor.nodeType === 3
+        ? anchor.parentElement
+        : (anchor as HTMLElement)
+      : null
+  if (!anchorEl || !anchorEl.closest('#readerParagraphsContainer')) {
+    selBubble.value = null
+    return
+  }
+  const rect = sel.getRangeAt(0).getBoundingClientRect()
+  if (!rect || (rect.width === 0 && rect.height === 0)) {
+    selBubble.value = null
+    return
+  }
+  selBubble.value = {
+    x: Math.min(Math.max(rect.left + rect.width / 2, 76), window.innerWidth - 76),
+    y: Math.max(rect.top - 46, 64),
+    text,
+  }
+}
+
+async function onSelBubbleTap() {
+  const text = selBubble.value?.text || ''
+  selBubble.value = null
+  if (!text) return
+  const s = S()
+  const ta = document.getElementById('inputFreeTranslate') as HTMLTextAreaElement | null
+  if (ta) ta.value = text
+  if (s.rightCollapsed) {
+    s.rightCollapsed = false
+    applySidebarCollapseLayout()
+  }
+  switchInspectorTab('trans')
+  void translateSentenceOfflineOrOnline(text)
+  window.getSelection()?.removeAllRanges()
+  showToast('🌐 已填入词句翻译台')
+}
 
 // 每次进入精读页 = 专注阅读模式（抽屉/查词台自动收起，切换文章同样收起）
 watch(
@@ -296,6 +352,12 @@ onMounted(() => {
   el('btnClearWordMark')?.addEventListener('click', () => void clearWordMark())
   el('btnSaveWordNote')?.addEventListener('click', () => void saveWordNote())
 
+  // 快捷标注条（与下方大按钮同一套动作）
+  el('wordInspectorContent')?.querySelectorAll('.qm-btn[data-mk]').forEach((btn) => {
+    btn.addEventListener('click', () => void markCurrentWord((btn.getAttribute('data-mk') || 'core') as 'unknown' | 'core' | 'mastered'))
+  })
+  el('btnQuickClearMark')?.addEventListener('click', () => void clearWordMark())
+
   el('btnRunFreeTranslate')?.addEventListener('click', () => {
     const text = (el('inputFreeTranslate') as HTMLTextAreaElement | null)?.value || ''
     void translateSentenceOfflineOrOnline(text)
@@ -319,11 +381,28 @@ onMounted(() => {
   if (txtInline) txtInline.textContent = '行内: ' + (s.inlineNotesOpen ? '开' : '关')
   const txtHints = document.getElementById('txtToggleCetHints')
   if (txtHints) txtHints.textContent = '考纲: ' + (s.cetHintsOpen ? '开' : '关')
+
+  // 划词气泡：selectionchange 防抖刷新；滚动时隐藏
+  document.addEventListener('selectionchange', () => {
+    clearTimeout(selDebounce)
+    selDebounce = setTimeout(refreshSelBubble, 300)
+  })
+  el('centerReaderPane')?.addEventListener('scroll', () => {
+    selBubble.value = null
+  }, { passive: true })
 })
 </script>
 
 <template>
   <section id="viewReader" class="reader-mobile-root">
+    <!-- 划词翻译气泡（触屏优化） -->
+    <div
+      v-if="selBubble"
+      class="sel-bubble"
+      :style="{ left: selBubble.x + 'px', top: selBubble.y + 'px' }"
+      @click.stop="onSelBubbleTap"
+    >🌐 翻译选中</div>
+
     <!-- 抽屉遮罩（点按关闭抽屉） -->
     <div id="readerDrawerMask" class="reader-drawer-mask hidden"></div>
 
@@ -527,6 +606,14 @@ onMounted(() => {
                   </div>
                 </div>
                 <span id="inspectWordExamTag" class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 shrink-0">CET-4 高频</span>
+              </div>
+
+              <!-- 快捷标注条：一排直达，免去滚动到下方大按钮（v1.1 新增） -->
+              <div class="quick-mark-row">
+                <button type="button" data-mk="unknown" class="qm-btn qm-unknown">🔴 生词</button>
+                <button type="button" data-mk="core" class="qm-btn qm-core">🟡 核心</button>
+                <button type="button" data-mk="mastered" class="qm-btn qm-mastered">🟢 已熟</button>
+                <button id="btnQuickClearMark" type="button" class="qm-btn qm-clear" title="清除该词标注">✕</button>
               </div>
 
               <div class="p-3 rounded-xl" style="background: var(--bg-subcard)">
@@ -761,5 +848,60 @@ onMounted(() => {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+/* ---- 快捷标注条（v1.1）---- */
+.quick-mark-row {
+  display: flex;
+  gap: 6px;
+}
+.qm-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 4px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid;
+  transition: background-color 0.15s ease;
+}
+.qm-unknown {
+  border-color: #fecdd3;
+  background-color: rgba(254, 226, 226, 0.7);
+  color: #be123c;
+}
+.qm-core {
+  border-color: #fde68a;
+  background-color: rgba(254, 243, 199, 0.7);
+  color: #92400e;
+}
+.qm-mastered {
+  border-color: #a7f3d0;
+  background-color: rgba(209, 250, 229, 0.7);
+  color: #047857;
+}
+.qm-clear {
+  flex: 0 0 44px;
+  border-color: var(--border-col);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* ---- 划词翻译气泡 ---- */
+.sel-bubble {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background-color: rgba(15, 23, 42, 0.94);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.35);
 }
 </style>

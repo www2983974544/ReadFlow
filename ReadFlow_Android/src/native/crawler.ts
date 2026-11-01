@@ -15,6 +15,24 @@ export interface CrawlResult {
   liveOrigin: 'rss' | 'wikipedia' | null
 }
 
+// v1.1 抓取源健康度：一次抓取流程中每个 RSS 源的尝试结果
+export interface SourceHealth {
+  name: string
+  ok: boolean
+  detail: string
+  ms: number
+}
+
+let lastSourceHealth: SourceHealth[] = []
+
+export function getLastSourceHealth(): SourceHealth[] {
+  return lastSourceHealth
+}
+
+export function getSourceNames(): string[] {
+  return SOURCES.map((s) => s.name)
+}
+
 interface RssSource {
   name: string
   rssUrl: string
@@ -223,7 +241,80 @@ function nowId(): string {
   return 'art-live-' + String(Date.now())
 }
 
-// ---- RSS 抓取主流程（news.py fetch_rss_article 逐行移植，12s 总时限） ----
+// ---- RSS 抓取主流程（news.py fetch_rss_article 逐行移植，12s 总时限；逐源健康度记录） ----
+async function attemptSource(src: RssSource, levelTag: string, deadline: number, health: SourceHealth[]): Promise<Article | null> {
+  const started = Date.now()
+  const record = (ok: boolean, detail: string) => {
+    health.push({ name: src.name, ok, detail, ms: Date.now() - started })
+  }
+  try {
+    if (Date.now() > deadline) {
+      record(false, '总时限已到')
+      return null
+    }
+    const xml = await httpGetText(src.rssUrl, 10000)
+    if (!xml) {
+      record(false, '订阅源超时/不可达')
+      return null
+    }
+    const entries = parseFeed(xml).filter((e) => e.link && e.title)
+    if (entries.length === 0) {
+      record(false, '订阅源为空')
+      return null
+    }
+
+    const entry = entries[0]
+    if (Date.now() > deadline) {
+      record(false, '总时限已到')
+      return null
+    }
+
+    if (entry.publishedAt) {
+      const ageDays = (Date.now() - entry.publishedAt.getTime()) / 86400000
+      if (ageDays > 60) {
+        record(false, '最新条目超 60 天（陈旧）')
+        return null
+      }
+    }
+
+    const page = await httpGetText(entry.link, 8000)
+    const bodyText = page ? extractParagraphBlocks(page) : null
+    const paragraphs = splitIntoParagraphs(bodyText || '')
+
+    if (paragraphs.length < 2 || paragraphs.reduce((n, p) => n + p.split(/\s+/).length, 0) < 120) {
+      record(false, '正文过短（<2 段或 <120 词）')
+      return null
+    }
+
+    const category = classifyCategory(entry.title, entry.summary)
+    const bodyWords = paragraphs.join(' ').split(/\s+/).length
+    const examLevel = bodyWords > 330 ? 'CET-6' : 'CET-4'
+    const firstSentence = paragraphs[0].split(/(?<=[.!?])\s+/)[0]
+
+    record(true, '抓取成功')
+    return {
+      id: nowId(),
+      title: entry.title,
+      titleCn: entry.title + '（实时在线爬取）',
+      source: src.name,
+      sourceUrl: entry.link,
+      category,
+      examLevel: levelTag || examLevel,
+      lexile: '1090L',
+      cetRatio: '18.0%',
+      examFreqTag: levelTag ? '⚡ 实时网络爬取 · ' + levelTag : '⚡ 实时网络爬取 · 四六级同源科普',
+      inLibrary: false,
+      readStatus: 'unread',
+      paragraphs: liveParagraphs(paragraphs),
+      complexSentence: complexSentenceTemplate(firstSentence),
+      quiz: quizTemplate(entry.title),
+    }
+  } catch (e) {
+    record(false, '异常: ' + ((e as Error)?.message || 'unknown'))
+    return null
+  }
+}
+
 async function fetchRssArticle(levelTag: string): Promise<Article | null> {
   const deadline = Date.now() + 12000
   const sources = [...SOURCES]
@@ -234,56 +325,21 @@ async function fetchRssArticle(levelTag: string): Promise<Article | null> {
   }
 
   for (const src of sources) {
+    const art = await attemptSource(src, levelTag, deadline, lastSourceHealth)
+    if (art) return art
     if (Date.now() > deadline) break
-    try {
-      const xml = await httpGetText(src.rssUrl, 10000)
-      if (!xml) continue
-      const entries = parseFeed(xml).filter((e) => e.link && e.title)
-      if (entries.length === 0) continue
-
-      const entry = entries[0]
-      if (Date.now() > deadline) break
-
-      if (entry.publishedAt) {
-        const ageDays = (Date.now() - entry.publishedAt.getTime()) / 86400000
-        if (ageDays > 60) continue
-      }
-
-      const page = await httpGetText(entry.link, 8000)
-      const bodyText = page ? extractParagraphBlocks(page) : null
-      const paragraphs = splitIntoParagraphs(bodyText || '')
-
-      if (paragraphs.length < 2 || paragraphs.reduce((n, p) => n + p.split(/\s+/).length, 0) < 120) {
-        continue
-      }
-
-      const category = classifyCategory(entry.title, entry.summary)
-      const bodyWords = paragraphs.join(' ').split(/\s+/).length
-      const examLevel = bodyWords > 330 ? 'CET-6' : 'CET-4'
-      const firstSentence = paragraphs[0].split(/(?<=[.!?])\s+/)[0]
-
-      return {
-        id: nowId(),
-        title: entry.title,
-        titleCn: entry.title + '（实时在线爬取）',
-        source: src.name,
-        sourceUrl: entry.link,
-        category,
-        examLevel: levelTag || examLevel,
-        lexile: '1090L',
-        cetRatio: '18.0%',
-        examFreqTag: levelTag ? '⚡ 实时网络爬取 · ' + levelTag : '⚡ 实时网络爬取 · 四六级同源科普',
-        inLibrary: false,
-        readStatus: 'unread',
-        paragraphs: liveParagraphs(paragraphs),
-        complexSentence: complexSentenceTemplate(firstSentence),
-        quiz: quizTemplate(entry.title),
-      }
-    } catch {
-      continue
-    }
   }
   return null
+}
+
+// v1.1 单源重试：只抓指定源（feed 10s + 正文 8s），并更新该源健康度记录
+export async function fetchRssFromSource(name: string, levelTag: string): Promise<Article | null> {
+  const src = SOURCES.find((s) => s.name === name)
+  if (!src) return null
+  const health: SourceHealth[] = []
+  const art = await attemptSource(src, levelTag, Date.now() + 18000, health)
+  lastSourceHealth = lastSourceHealth.map((h) => (h.name === name ? health[health.length - 1] : h))
+  return art
 }
 
 // ---- Wikipedia 兜底（news.py fetch_wikipedia_article 逐行移植，2.2s 超时） ----

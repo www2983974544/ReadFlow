@@ -251,6 +251,14 @@ const ringTicks = computed<Tick[]>(() => {
             <span class="text-sky-300/90 font-medium text-xs shrink-0">目标时间</span>
             <input id="homeExamDateInput" type="datetime-local" value="2026-12-19T15:00" class="home-config-input flex-1" />
           </div>
+          <!-- 每日学习提醒（v1.1）：本地每日定时通知 -->
+          <div class="home-config-row">
+            <label class="flex items-center gap-1.5 text-xs text-sky-300/90 font-medium shrink-0 cursor-pointer select-none">
+              <input id="homeReminderToggle" type="checkbox" class="reminder-toggle" />
+              <span>🔔 每日提醒</span>
+            </label>
+            <input id="homeReminderTime" type="time" value="20:00" class="home-config-input flex-1" />
+          </div>
         </div>
       </div>
     </div>
@@ -312,5 +320,10 @@ const ringTicks = computed<Tick[]>(() => {
 .home-config-select:focus,
 .home-config-input:focus {
   border-color: #22d3ee;
+}
+.reminder-toggle {
+  width: 16px;
+  height: 16px;
+  accent-color: #22d3ee;
 }
 </style>

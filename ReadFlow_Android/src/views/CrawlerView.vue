@@ -74,12 +74,18 @@ watch(
           <summary>📟 引擎日志</summary>
           <div class="crawl-log-panel">
             <div id="crawlerTerminalOutput" class="space-y-1 text-[11px] leading-relaxed max-h-28 overflow-y-auto text-emerald-300 font-mono">
-              <div>[SYSTEM] ReadFlow v2.1 题源引擎已加载，内置牛津离线词典与 5 大高频外刊规则。</div>
+              <div>[SYSTEM] ReadFlow v1.0 题源引擎已加载，内置牛津离线词典与 5 大高频外刊规则。</div>
               <div>[FILTER] 词数过滤区间：240-480 词 | 考纲核心词覆盖率阈值 ≥ 14%。</div>
               <div>[READY] 点击「立即抓取同源外刊」获取最新匹配文章...</div>
             </div>
           </div>
         </details>
+
+        <!-- 抓取源健康度（v1.1）：✓成功 / ✗失败可点重试 / –未尝试 -->
+        <div class="src-health-wrap">
+          <span class="src-health-label">源状态</span>
+          <div id="crawlerSourceHealth" class="src-health-strip"></div>
+        </div>
       </div>
     </div>
 
@@ -92,5 +98,59 @@ watch(
 <style scoped>
 .crawler-page {
   padding: 10px 12px 0;
+}
+.src-health-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.src-health-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  opacity: 0.65;
+  padding-top: 5px;
+}
+.src-health-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+.src-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.src-idle {
+  background-color: var(--bg-subcard);
+  border: 1px solid var(--border-col);
+  color: var(--text-muted);
+}
+.src-ok {
+  background-color: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #047857;
+}
+body.theme-dark .src-ok {
+  color: #34d399;
+}
+.src-fail {
+  background-color: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  color: #be123c;
+  cursor: pointer;
+}
+body.theme-dark .src-fail {
+  color: #fb7185;
+}
+.src-retry:active {
+  background-color: rgba(244, 63, 94, 0.22);
 }
 </style>

@@ -1,6 +1,18 @@
 // Customizable exam timer (ported from cet_reading_master.html L4677-4740).
+// 移动版增强：计时运行期间保持屏幕常亮（@capacitor-community/keep-awake，
+// Android 走原生，浏览器走 Screen Wake Lock API，均包 try/catch 静默降级）。
+import { KeepAwake } from '@capacitor-community/keep-awake'
 import { S } from './state'
 import { recordTodayStudyDelta, showToast } from './ui-fns'
+
+async function setKeepAwake(on: boolean) {
+  try {
+    if (on) await KeepAwake.keepAwake()
+    else await KeepAwake.allowSleep()
+  } catch {
+    /* 插件不可用/权限缺失时静默降级 */
+  }
+}
 
 const state = {
   timerSeconds: 8 * 60,
@@ -45,10 +57,12 @@ export function toggleExamTimer() {
   if (state.timerRunning) {
     clearInterval(state.timerInterval)
     state.timerRunning = false
+    void setKeepAwake(false)
     display.textContent = '已暂停 (' + formatTime(state.timerSeconds) + ')'
     return
   }
   state.timerRunning = true
+  void setKeepAwake(true)
   display.textContent = formatTime(state.timerSeconds) + ' 计时中'
   state.timerInterval = window.setInterval(() => {
     if (state.timerSeconds > 0) {
@@ -61,6 +75,7 @@ export function toggleExamTimer() {
     } else {
       clearInterval(state.timerInterval)
       state.timerRunning = false
+      void setKeepAwake(false)
       display.textContent = '⏰ 时间到！'
       showToast(`⏰ 自定义 ${S().customTimerMinutes} 分钟阅读限时已到！`)
     }
@@ -75,6 +90,7 @@ export function resetExamTimer() {
   S().customTimerMinutes = mins
   clearInterval(state.timerInterval)
   state.timerRunning = false
+  void setKeepAwake(false)
   state.timerSeconds = mins * 60
   const display = document.getElementById('txtTimerDisplay')
   if (display) display.textContent = formatTime(state.timerSeconds) + ' 限时读'

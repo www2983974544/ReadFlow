@@ -41,21 +41,31 @@ void applyThemeMode
         <button
           type="button"
           class="theme-btn"
+          title="明亮模式"
           :class="{ 'theme-active': currentTheme() === 'light' }"
           @click="setTheme('light')"
         >☀️</button>
         <button
           type="button"
           class="theme-btn"
+          title="护眼模式"
           :class="{ 'theme-active': currentTheme() === 'sepia' }"
           @click="setTheme('sepia')"
         >📜</button>
         <button
           type="button"
           class="theme-btn"
+          title="夜间模式"
           :class="{ 'theme-active': currentTheme() === 'dark' }"
           @click="setTheme('dark')"
         >🌙</button>
+        <button
+          type="button"
+          class="theme-btn"
+          title="跟随系统深浅色"
+          :class="{ 'theme-active': currentTheme() === 'system' }"
+          @click="setTheme('system')"
+        >🌗</button>
       </div>
       <button type="button" class="guide-btn" title="上手指南与版本记录" @click="ui.guideOpen = true">❓</button>
     </div>

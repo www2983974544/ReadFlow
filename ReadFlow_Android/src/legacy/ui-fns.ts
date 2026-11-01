@@ -35,12 +35,26 @@ export function showToast(msg: string) {
   }, 2400)
 }
 
-// ---- 三主题（沿桌面 applyThemeMode：body class + 持久化） ----
+// ---- 主题（明亮/护眼/夜间/跟随系统；沿桌面 body class 方案 + 持久化） ----
+const prefersDarkQuery =
+  typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null
+let activeThemeMode = 'light'
+
+function resolveSystemTheme(): 'light' | 'dark' {
+  return prefersDarkQuery?.matches ? 'dark' : 'light'
+}
+
 export function applyThemeMode(mode: string) {
+  activeThemeMode = mode
   const body = document.body
   body.classList.remove('theme-sepia', 'theme-dark')
-  if (mode === 'sepia') body.classList.add('theme-sepia')
-  if (mode === 'dark') body.classList.add('theme-dark')
+  if (mode === 'sepia') {
+    body.classList.add('theme-sepia')
+  } else if (mode === 'dark') {
+    body.classList.add('theme-dark')
+  } else if (mode === 'system') {
+    if (resolveSystemTheme() === 'dark') body.classList.add('theme-dark')
+  }
   // 持久化（桌面为已批准的行为差异：主题重启保留）
   void useSettingsStore().set('themeMode', mode)
   void S()
@@ -48,6 +62,18 @@ export function applyThemeMode(mode: string) {
 
 export function setThemeMode(mode: string) {
   applyThemeMode(mode)
+}
+
+// 跟随系统档：系统深浅色切换时实时重应用（监听器只注册一次）
+if (prefersDarkQuery && typeof prefersDarkQuery.addEventListener === 'function') {
+  prefersDarkQuery.addEventListener('change', () => {
+    if (activeThemeMode === 'system') applyThemeMode('system')
+  })
+}
+
+// 供头部按钮高亮判断用
+export function currentThemeMode() {
+  return activeThemeMode
 }
 
 // ---- 头部/统计条数字（移动端角标由 BottomTabBar 的 computed 自动同步，

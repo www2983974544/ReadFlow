@@ -1,9 +1,12 @@
 // Home launchpad: cosmos canvas, countdown display & exam config
-// （复制自桌面 frontend/src/legacy/home.ts@v2.1；移动版增加重复绑定守卫）
+// （复制自桌面 frontend/src/legacy/home.ts@v2.1；移动版增加重复绑定守卫
+//   与 v1.1 每日学习提醒设置行）
 import { initCosmosStarfieldCanvas } from './cosmos'
 import { S } from './state'
 import { showToast } from './ui-fns'
+import { useSettingsStore } from '../stores/settings'
 import { useUiStore } from '../stores/ui'
+import { applyDailyReminder } from '../native/reminder'
 
 let countdownTimerId = 0
 
@@ -106,5 +109,31 @@ export function initHomeView() {
       updateHomeCountdownDisplay()
       showToast('📅 考试目标日期已更新')
     }
+  })
+
+  // ---- v1.1 每日学习提醒（设置持久化 + 本地通知注册） ----
+  const settingsStore = useSettingsStore()
+  const reminderToggle = document.getElementById('homeReminderToggle') as HTMLInputElement | null
+  const reminderTime = document.getElementById('homeReminderTime') as HTMLInputElement | null
+  if (reminderToggle) reminderToggle.checked = settingsStore.settings.reminder_enabled === true
+  if (reminderTime) reminderTime.value = String(settingsStore.settings.reminder_time || '20:00')
+
+  const applyReminder = async () => {
+    const enabled = reminderToggle?.checked === true
+    const time = reminderTime?.value || '20:00'
+    await settingsStore.set('reminder_enabled', enabled)
+    await settingsStore.set('reminder_time', time)
+    const result = await applyDailyReminder(enabled, time)
+    if (result === 'denied') {
+      showToast('⚠️ 通知权限被拒绝，请到系统设置开启通知')
+    } else if (enabled) {
+      showToast(result === 'native' ? `🔔 每日提醒已开启：每天 ${time} 通知你精读打卡` : '🔔 提醒设置已保存（真机上生效）')
+    } else {
+      showToast('🔕 每日提醒已关闭')
+    }
+  }
+  reminderToggle?.addEventListener('change', () => void applyReminder())
+  reminderTime?.addEventListener('change', () => {
+    if (reminderToggle?.checked) void applyReminder()
   })
 }

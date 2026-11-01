@@ -6,7 +6,7 @@ import { openArticleForReading, renderSidebarArticleList } from './reader'
 import { showToast, updateTopBadgesAndStats } from './ui-fns'
 import { useArticlesStore } from '../stores/articles'
 import { useUiStore } from '../stores/ui'
-import { pickExtraPool, runClientCrawl } from '../native/crawler'
+import { pickExtraPool, runClientCrawl, fetchRssFromSource, getLastSourceHealth, getSourceNames } from '../native/crawler'
 import type { Article } from '../types'
 
 export function renderCrawlerDiscoveryGrid() {
@@ -90,6 +90,64 @@ function openLogDrawer() {
   if (drawer) drawer.open = true
 }
 
+// v1.1 抓取源健康度 chips：✓成功 / ✗失败(可点重试) / –未尝试
+function renderSourceHealth() {
+  const strip = document.getElementById('crawlerSourceHealth')
+  if (!strip) return
+  const health = getLastSourceHealth()
+  const names = getSourceNames()
+  if (health.length === 0) {
+    strip.innerHTML = names
+      .map((n) => `<span class="src-chip src-idle" title="尚未尝试">– ${n}</span>`)
+      .join('')
+    return
+  }
+  strip.innerHTML = names
+    .map((n) => {
+      const h = health.find((x) => x.name === n)
+      if (!h) return `<span class="src-chip src-idle" title="本次未尝试">– ${n}</span>`
+      if (h.ok) return `<span class="src-chip src-ok" title="${h.detail} (${(h.ms / 1000).toFixed(1)}s)">✓ ${n}</span>`
+      return `<button type="button" data-src="${n}" class="src-chip src-fail src-retry" title="${h.detail} · 点击重试此源">✗ ${n}</button>`
+    })
+    .join('')
+}
+
+// 单源重试（只抓该源，成功即入库）
+async function retrySingleSource(name: string, chip: HTMLElement) {
+  const s = S()
+  if ((document.getElementById('btnStartCrawlBatch') as HTMLButtonElement | null)?.disabled) return
+  const crawlBtn = document.getElementById('btnStartCrawlBatch') as HTMLButtonElement | null
+  if (crawlBtn) crawlBtn.disabled = true
+  chip.textContent = '⏳ ' + name
+  appendCrawlerLog(`[RETRY] 正在单独重试外刊源: ${name} ...`)
+
+  const targetLevel = (document.getElementById('crawlTargetLevel') as HTMLSelectElement | null)?.value || 'all'
+  const art = await fetchRssFromSource(name, targetLevel === 'all' ? '' : targetLevel)
+  if (crawlBtn) crawlBtn.disabled = false
+
+  if (art) {
+    await useArticlesStore().add(art)
+    updateTopBadgesAndStats()
+    renderCrawlerDiscoveryGrid()
+    renderSidebarArticleList()
+    appendCrawlerLog(`[LIVE-WEB] 单源重试成功: "${art.title}"`)
+    showToast(`🌐 ${name} 重试成功，已抓到 1 篇新文章`)
+  } else {
+    appendCrawlerLog(`[RETRY] ${name} 重试仍失败。`)
+    showToast(`⚠️ ${name} 重试失败，稍后再试`)
+  }
+  renderSourceHealth()
+}
+
+function appendCrawlerLog(txt: string) {
+  const logBox = document.getElementById('crawlerTerminalOutput')
+  if (!logBox) return
+  const line = document.createElement('div')
+  line.textContent = txt
+  logBox.appendChild(line)
+  logBox.scrollTop = logBox.scrollHeight
+}
+
 export async function runCrawlFlow() {
   if (crawlRunning) return // real crawls take up to ~14s; block double-fires
   crawlRunning = true
@@ -147,6 +205,7 @@ export async function runCrawlFlow() {
     updateTopBadgesAndStats()
     renderCrawlerDiscoveryGrid()
     renderSidebarArticleList()
+    renderSourceHealth()
 
     if (res.live) {
       setCrawlerPulse('ready')
@@ -193,6 +252,14 @@ export function initCrawlerView() {
   document.getElementById('crawlTargetLevel')?.addEventListener('change', renderCrawlerDiscoveryGrid)
   document.getElementById('crawlTargetCategory')?.addEventListener('change', renderCrawlerDiscoveryGrid)
   document.getElementById('crawlTargetSource')?.addEventListener('change', renderCrawlerDiscoveryGrid)
+
+  // 抓取源健康度：失败源 chip 点击 = 单源重试
+  document.getElementById('crawlerSourceHealth')?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest('.src-retry') as HTMLElement | null
+    if (!chip) return
+    const name = chip.getAttribute('data-src') || ''
+    if (name) void retrySingleSource(name, chip)
+  })
   document.getElementById('btnOpenCustomModalFromCrawler')?.addEventListener('click', () => {
     ui.customImportOpen = true
   })
@@ -239,4 +306,7 @@ export function initCrawlerView() {
 
   // top-bar "实时爬取新刊" quick action (switches tab, then crawls)
   window.addEventListener('readflow:quick-crawl', () => void runCrawlFlow())
+
+  // 初始渲染源健康度（空闲态）
+  renderSourceHealth()
 }
