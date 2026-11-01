@@ -56,6 +56,7 @@ def main() -> None:
         width=1440,
         height=900,
         min_size=(980, 640),
+        text_select=True,  # pywebview 默认全局禁选文字；开启后 UI 文字可选中/复制
     )
     # private_mode=False keeps WebView2 localStorage/cookies across restarts.
     webview.start(private_mode=False, storage_path=os.path.join(data_dir, "webview"))

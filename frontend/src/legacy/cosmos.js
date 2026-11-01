@@ -251,6 +251,12 @@ function initCosmosStarfieldCanvas() {
 
       let frame = 0;
       function renderUniverseFrame() {
+        // v1.1: skip all draw work while the home view is not visible (saves CPU);
+        // the loop keeps scheduling so it resumes instantly when unpaused.
+        if (window.__cosmosPaused) {
+          requestAnimationFrame(renderUniverseFrame);
+          return;
+        }
         frame++;
         mouseX += (targetMouseX - mouseX) * 0.06;
         mouseY += (targetMouseY - mouseY) * 0.06;
@@ -444,5 +450,10 @@ function updateSmoothOrbitalRing60FPS() {
       }
     }
 
+
+// v1.1: pause switch driven by App.vue's active-view watcher.
+export function setCosmosPaused(paused) {
+  window.__cosmosPaused = paused === true;
+}
 
 export { initCosmosStarfieldCanvas }

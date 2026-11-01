@@ -34,38 +34,41 @@ export function renderVocabNotebook() {
       const synonymsText = m.synonyms || dictInfo.synonyms
 
       const badgeMap: Record<string, string> = {
-        unknown: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">🔴 陌生生词</span>`,
-        core: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">🟡 四六级核心</span>`,
-        mastered: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">🟢 已掌握</span>`,
+        unknown: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800 shrink-0">🔴 生词</span>`,
+        core: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 shrink-0">🟡 核心</span>`,
+        mastered: `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0">🟢 已掌握</span>`,
       }
       const maskClass = s.flashcardMasked ? 'blur-sm hover:blur-none transition cursor-pointer select-none' : ''
 
       return `
-          <div class="surface-card p-4 shadow-sm flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <h4 class="text-lg font-bold text-indigo-600">${m.word}</h4>
-                  <span class="text-xs font-mono opacity-70">${m.phonetic || ''}</span>
+          <div class="surface-card p-4 shadow-sm flex flex-col justify-between space-y-2.5">
+            <div class="space-y-2 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <h4 class="text-xl font-bold tracking-tight text-indigo-600 truncate">${m.word}</h4>
+                  <span class="text-xs font-mono opacity-60 shrink-0">${m.phonetic || ''}</span>
+                  <button type="button" data-word="${m.word}" class="btn-vocab-speak p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition shrink-0" title="播放发音">🔊</button>
                 </div>
                 ${badgeMap[m.status] || ''}
               </div>
-              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs ${maskClass} space-y-1.5">
+              <div class="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs ${maskClass} space-y-1">
                 <div class="font-bold text-indigo-950">${m.cn}</div>
-                ${m.customNote ? `<div class="text-indigo-600 font-medium">✏️ 个人批注: ${m.customNote}</div>` : ''}
-                <div class="pt-1.5 border-t border-slate-200/70 text-[11px] leading-relaxed">
-                  <div><strong class="text-amber-800">🧬 派生/不同词性：</strong>${derivativesText}</div>
-                  <div class="mt-0.5"><strong class="text-emerald-800">🔄 同义替换词：</strong>${synonymsText}</div>
+                ${m.customNote ? `<div class="text-indigo-600 font-medium">✏️ ${m.customNote}</div>` : ''}
+              </div>
+              <details class="text-xs">
+                <summary class="cursor-pointer select-none text-[11px] font-medium opacity-65 hover:opacity-100 flex items-center justify-between py-1">
+                  <span>🧬 派生词 · 同义替换 · 原句语境</span><span>▾</span>
+                </summary>
+                <div class="space-y-1 pt-1.5 leading-relaxed" style="border-top: 1px dashed var(--border-col)">
+                  <div><strong class="text-amber-800">🧬 派生：</strong>${derivativesText}</div>
+                  <div><strong class="text-emerald-800">🔄 同义：</strong>${synonymsText}</div>
+                  ${m.context ? `<div class="italic opacity-75">📌 “${m.context}”</div>` : ''}
                 </div>
-              </div>
-              ${m.context ? `<p class="text-[11px] italic opacity-75">“${m.context}”</p>` : ''}
+              </details>
             </div>
-            <div class="pt-2 border-t border-slate-200/70 flex items-center justify-between text-[11px] opacity-75">
-              <span class="truncate max-w-[180px]">出自: ${m.articleTitle || '外刊精读'}</span>
-              <div class="flex items-center gap-2">
-                <button type="button" data-word="${m.word}" class="btn-vocab-speak text-indigo-600 font-semibold hover:underline">🔊 发音</button>
-                <button type="button" data-lemma="${m.lemma}" class="btn-vocab-del text-rose-600 hover:underline">删除</button>
-              </div>
+            <div class="pt-2 flex items-center justify-between text-[11px] opacity-60" style="border-top: 1px solid var(--border-col)">
+              <span class="truncate max-w-[200px]">出自: ${m.articleTitle || '外刊精读'}</span>
+              <button type="button" data-lemma="${m.lemma}" class="btn-vocab-del text-[11px] text-slate-400 hover:text-rose-600 transition shrink-0">删除</button>
             </div>
           </div>
         `
@@ -107,9 +110,24 @@ export function exportVocabCsv() {
 export function initVocabView() {
   const s = S()
 
+  // Segmented-slot active state (new in v1.1: the legacy buttons had no
+  // visible active indicator — clicking only filtered the data)
+  const setVocabFilterStyle = (activeId: string) => {
+    ;['btnFilterVocabAll', 'btnFilterVocabUnknown', 'btnFilterVocabCore', 'btnFilterVocabMastered'].forEach((id) => {
+      const btn = document.getElementById(id)
+      if (!btn) return
+      btn.className =
+        id === activeId
+          ? 'vocab-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-indigo-700 shadow-sm'
+          : 'vocab-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600'
+    })
+  }
+  setVocabFilterStyle('btnFilterVocabAll')
+
   document.querySelectorAll('.vocab-filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       s.vocabFilter = btn.getAttribute('data-vfilter') || 'all'
+      setVocabFilterStyle(btn.id)
       renderVocabNotebook()
     })
   })

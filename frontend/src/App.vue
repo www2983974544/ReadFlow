@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import ReaderView from './components/ReaderView.vue'
 import HomeView from './components/views/HomeView.vue'
@@ -7,10 +7,12 @@ import CrawlerView from './components/views/CrawlerView.vue'
 import LibraryView from './components/views/LibraryView.vue'
 import VocabView from './components/views/VocabView.vue'
 import StatsView from './components/views/StatsView.vue'
+import { setCosmosPaused } from './legacy/cosmos'
 import { S, hydrateExamSettings } from './legacy/state'
 import { applySidebarCollapseLayout, applyThemeMode, showToast, updateTopBadgesAndStats } from './legacy/ui-fns'
 import {
   clearActiveWordSelection,
+  clearWordMark,
   markCurrentWord,
   renderCurrentArticle,
   renderSidebarArticleList,
@@ -35,6 +37,7 @@ async function submitCustomArticle() {
   const categoryInput = get<HTMLSelectElement>('customInputCategory')
   const bodyInput = get<HTMLTextAreaElement>('customInputBody')
   const addLibInput = get<HTMLInputElement>('customCheckAddLib')
+  const levelInput = get<HTMLSelectElement>('customInputLevel')
   if (!titleInput || !sourceInput || !categoryInput || !bodyInput || !addLibInput) return
 
   const title = titleInput.value.trim() || 'Custom English Reading Passage'
@@ -48,6 +51,10 @@ async function submitCustomArticle() {
     return
   }
 
+  const autoLevel = body.split(/\s+/).length > 330 ? 'CET-6' : 'CET-4'
+  const examLevel =
+    levelInput && levelInput.value !== 'auto' ? levelInput.value : autoLevel
+
   const rawParas = body
     .split(/\n+/)
     .map((x) => x.trim())
@@ -59,7 +66,7 @@ async function submitCustomArticle() {
     source: source,
     sourceUrl: '',
     category: category,
-    examLevel: body.split(/\s+/).length > 330 ? 'CET-6' : 'CET-4',
+    examLevel: examLevel,
     lexile: '1050L',
     cetRatio: '17.5%',
     examFreqTag: '✨ 自定义导入外刊 · 离线逐词秒查',
@@ -123,9 +130,19 @@ onMounted(async () => {
     else if (e.key === '1') void markCurrentWord('unknown')
     else if (e.key === '2') void markCurrentWord('core')
     else if (e.key === '3') void markCurrentWord('mastered')
+    else if (e.key === '0') void clearWordMark()
     else if (e.key.toLowerCase() === 's') speakSingleWord(S().activeWord)
     else if (e.key.toLowerCase() === 'b') document.getElementById('btnToggleBilingual')?.click()
   })
+
+  // Pause the home cosmos canvas while other views are shown (CPU/battery).
+  setCosmosPaused(ui.activeView !== 'home')
+  watch(
+    () => ui.activeView,
+    (view) => {
+      setCosmosPaused(view !== 'home')
+    },
+  )
 })
 </script>
 
@@ -154,12 +171,12 @@ onMounted(async () => {
 
   <!-- MODAL 1: CUSTOM ARTICLE IMPORT -->
   <div id="modalCustomImport" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" :class="{ hidden: !ui.customImportOpen }">
-    <div class="surface-card max-w-2xl w-full p-6 shadow-2xl space-y-4">
+    <div class="surface-card max-w-xl w-full p-6 rounded-2xl shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-200 pb-3">
         <h3 class="text-base font-bold">📋 导入或解析自定义英文文章 (支持纯离线分词 & 牛津词库打标)</h3>
         <button id="btnCloseCustomModal" type="button" class="text-slate-400 hover:text-slate-700 text-lg font-bold" @click="ui.customImportOpen = false">✕</button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
         <div>
           <label class="block font-semibold mb-1">文章标题：</label>
           <input id="customInputTitle" type="text" placeholder="例如：How AI Reshapes University Education" class="w-full rounded-xl border border-slate-200 px-3 py-2 bg-transparent" />
@@ -176,6 +193,15 @@ onMounted(async () => {
             <option value="心理与教育认知">心理与教育认知</option>
             <option value="经济与商业职场">经济与商业职场</option>
             <option value="社会文化与健康">社会文化与健康</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">目标考试难度：</label>
+          <select id="customInputLevel" class="w-full rounded-xl border border-slate-200 px-3 py-2 bg-transparent">
+            <option value="auto">自动按词数判断</option>
+            <option value="CET-4">英语四级 CET-4</option>
+            <option value="CET-6">英语六级 CET-6</option>
+            <option value="安徽专升本">安徽专升本英语</option>
           </select>
         </div>
       </div>

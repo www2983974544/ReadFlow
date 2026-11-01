@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import FRONTEND_DIST
 from .db import SessionLocal, init_db
 from .news import seed_crawl_sources
-from .routers import articles, crawl, settings, stats, vocab
+from .routers import articles, crawl, settings, stats, tts, vocab
 from .seed import seed_if_empty
 from .selftest_page import SELFTEST_HTML
 
@@ -31,6 +31,7 @@ app.include_router(vocab.router)
 app.include_router(stats.router)
 app.include_router(settings.router)
 app.include_router(crawl.router)
+app.include_router(tts.router)
 
 
 @app.get("/api/ping")

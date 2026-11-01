@@ -1,6 +1,6 @@
 // My library view (ported from renderMyLibraryGrid + bindings + JSON export).
 import { S } from './state'
-import { renderCurrentArticle, renderSidebarArticleList, updateFinishedButtonState } from './reader'
+import { openArticleForReading, renderSidebarArticleList, updateFinishedButtonState } from './reader'
 import { recordTodayStudyDelta, showToast, updateTopBadgesAndStats } from './ui-fns'
 import { useArticlesStore } from '../stores/articles'
 import { useUiStore } from '../stores/ui'
@@ -13,10 +13,17 @@ export function renderMyLibraryGrid() {
     .trim()
     .toLowerCase()
   const statusFilter = (document.getElementById('selectLibraryStatusFilter') as HTMLSelectElement | null)?.value || 'all'
+  // Triple filter strip (identical to the crawler page, default: show all)
+  const targetLevel = (document.getElementById('libTargetLevel') as HTMLSelectElement | null)?.value || 'all'
+  const targetCat = (document.getElementById('libTargetCategory') as HTMLSelectElement | null)?.value || 'all'
+  const targetSrc = (document.getElementById('libTargetSource') as HTMLSelectElement | null)?.value || 'all'
 
   const list = s.articles.filter((a) => {
     if (!a.inLibrary) return false
     if (statusFilter !== 'all' && a.readStatus !== statusFilter) return false
+    if (targetLevel !== 'all' && a.examLevel !== targetLevel) return false
+    if (targetCat !== 'all' && a.category !== targetCat) return false
+    if (targetSrc !== 'all' && targetSrc !== 'Live Web Feed' && !a.source.includes(targetSrc.split(' ')[0])) return false
     if (
       query &&
       !(
@@ -104,15 +111,16 @@ export function initLibraryView() {
   document.getElementById('inputSearchLibrary')?.addEventListener('input', renderMyLibraryGrid)
   document.getElementById('selectLibraryStatusFilter')?.addEventListener('change', renderMyLibraryGrid)
   document.getElementById('btnExportLibraryJson')?.addEventListener('click', exportLibraryJson)
+  document.getElementById('libTargetLevel')?.addEventListener('change', renderMyLibraryGrid)
+  document.getElementById('libTargetCategory')?.addEventListener('change', renderMyLibraryGrid)
+  document.getElementById('libTargetSource')?.addEventListener('change', renderMyLibraryGrid)
 
   document.getElementById('myLibraryGrid')?.addEventListener('click', async (e) => {
     const target = e.target as HTMLElement
     const openBtn = target.closest('.btn-lib-open') as HTMLElement | null
     if (openBtn) {
-      s.currentArticleId = openBtn.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle()
+      openArticleForReading(openBtn.getAttribute('data-artid') || '')
       return
     }
     const toggleFinBtn = target.closest('.btn-lib-toggle-fin') as HTMLElement | null
@@ -161,10 +169,8 @@ export function initLibraryView() {
     // clicking anywhere on the card opens it for reading (user-requested v2.0 change)
     const card = target.closest('.lib-card') as HTMLElement | null
     if (card) {
-      s.currentArticleId = card.getAttribute('data-artid') || ''
       ui.switchView('reader')
-      renderSidebarArticleList()
-      renderCurrentArticle()
+      openArticleForReading(card.getAttribute('data-artid') || '')
     }
   })
 }

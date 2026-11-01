@@ -366,6 +366,7 @@ watch(
               <select id="homeExamTypeSelect" class="rounded-full bg-slate-900/90 text-white border border-slate-700/80 px-2.5 py-0.5 text-xs font-medium focus:outline-none focus:border-cyan-400" style="background:#090d16;color:#fff;">
                 <option value="英语六级" selected>英语六级 (CET-6)</option>
                 <option value="英语四级">英语四级 (CET-4)</option>
+                <option value="安徽专升本英语">安徽专升本英语</option>
                 <option value="考研英语">考研英语 (NETEM)</option>
                 <option value="雅思阅读">雅思阅读 (IELTS)</option>
                 <option value="托福阅读">托福阅读 (TOEFL)</option>
