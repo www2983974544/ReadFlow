@@ -279,11 +279,10 @@ async function submitCustomArticle() {
           </ul>
         </div>
         <div class="guide-box">
-          <strong>📜 版本迭代历史</strong>
+          <strong>📜 Android 版迭代历史</strong>
           <ul>
-            <li><strong>v2.1（当前）：</strong>版本标识与更新记录弹窗单一来源同步。</li>
-            <li><strong>v2.0：</strong>精读页杂志化改版（三 Tab 查词台、筛选抽屉、专注阅读模式）；获取页命令栏重构与三态诚实反馈；提速专项（预取+看门狗）；安徽专升本全链路；文章库三联筛选；单词库闪卡；统计页去花哨化。</li>
-            <li><strong>v1.x：</strong>四六级同源外刊获取、逐词点查三色标注、牛津离线词典、文章库/单词库/时间统计全模块。</li>
+            <li><strong>v1.0（当前 · Android 版首发）：</strong>以桌面 V2.1 功能集为基准的移动版：底部标签栏 + 精读页目录抽屉/三 Tab 查词台弹层 + 专注阅读模式 + 客户端真 RSS 爬虫（Readability 提取、Wikipedia 兜底）+ 有道真人朗读与系统 TTS 兜底 + 导出分享面板 + 返回键逐级导航。</li>
+            <li><strong>功能基线（桌面版迭代史）：</strong>桌面 v2.1（版本标识单一来源）、v2.0（精读页杂志化/获取页重构/提速专项/安徽专升本链路）、v1.x（同源外刊获取、逐词点查三色标注、牛津离线词典、全模块）。</li>
           </ul>
         </div>
       </div>

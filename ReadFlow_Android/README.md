@@ -31,5 +31,6 @@ npm run apk        # vite build + cap sync + gradlew assembleDebug
 2. 点开安装；提示"未知来源"时选择允许/仍要安装。
 3. 若已装旧版 v1.1 APK（versionCode 1），可直接覆盖安装（versionCode 2，数据兼容）。
 
-## 版本
-- v2.1.0（versionCode 2）：与桌面 V2.1 功能对齐的移动版重构。
+## 版本（移动端独立版本线，与桌面 v2.x 互不重叠）
+- **v1.0**（versionCode 3，分支 `mobile/v1.0`，标签 `android-v1.0`）：Android 版首发，功能基线对齐桌面 V2.1。后续移动端迭代按 v1.1、v1.2 递增（标签 `android-v1.x`）；桌面端继续在 main 分支按 v2.x 递增，两条线互不干扰。
+- 注：versionCode 从 3 起跳是为了保证已装过内部测试包（versionCode 1/2）的设备可直接覆盖升级。

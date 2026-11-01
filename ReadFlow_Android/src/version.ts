@@ -1,2 +1,3 @@
-// 与桌面 frontend/src/version.ts 同步的版本标识（功能对齐桌面 V2.1）。
-export const APP_VERSION = 'v2.1'
+// Android 移动版独立版本线（与桌面 frontend/src/version.ts 的 v2.x 线互不重叠）。
+// 功能基线对齐桌面 V2.1。
+export const APP_VERSION = 'v1.0'
