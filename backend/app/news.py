@@ -152,13 +152,23 @@ def _complex_sentence_template(first_sentence: str) -> dict:
 
 
 def fetch_rss_article(db: Session) -> Article | None:
-    """Fetch one fresh article from an enabled RSS source + body extraction."""
+    """Fetch one fresh article from an enabled RSS source + body extraction.
+
+    A wall-clock deadline (~20s) bounds the whole loop so a "half-broken"
+    network (navigator.onLine true but hosts unreachable) cannot stall the
+    crawl for minutes; the legacy Wikipedia fallback remains the safety net.
+    """
+    deadline = time.monotonic() + 12.0
     sources = db.query(CrawlSource).filter(CrawlSource.enabled.is_(True)).all()
     if not sources:
         return None
     random.shuffle(sources)
 
     for src in sources:
+        if time.monotonic() > deadline:
+            src.last_status = "deadline exceeded"
+            db.commit()
+            break
         try:
             with httpx.Client(timeout=10.0, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0 ReadFlow/2.0"}) as client:
                 resp = client.get(src.rss_url)
@@ -177,6 +187,11 @@ def fetch_rss_article(db: Session) -> Article | None:
             title = entry.title
             link = entry.link
             summary = getattr(entry, "summary", "") or ""
+
+            if time.monotonic() > deadline:
+                src.last_status = "deadline exceeded"
+                db.commit()
+                break
 
             fetched_at = datetime.fromtimestamp(time.mktime(entry.published_parsed)) if getattr(entry, "published_parsed", None) else None
             if fetched_at:

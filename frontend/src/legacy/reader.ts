@@ -4,6 +4,7 @@
 // code, with Pinia stores replacing AppState.
 import { lookupWordDefinitionSync, lemmatizeWord, CET_DICT } from '../core/dictionary'
 import { preloadWordHumanAudio, stopSpeechPlayback } from '../core/tts'
+import { showInspectorWordTab } from './inspector-tabs'
 import { S } from './state'
 import { applySidebarCollapseLayout, recordTodayStudyDelta, showToast, updateTopBadgesAndStats } from './ui-fns'
 import { useArticlesStore } from '../stores/articles'
@@ -115,7 +116,7 @@ export function renderCurrentArticle() {
   const badgeFreq = el('readerBadgeFreq')
   if (badgeLevel) badgeLevel.textContent = art.examLevel + (art.examLevel === 'CET-6' ? ' 六级核心' : ' 四级核心')
   if (badgeCategory) badgeCategory.textContent = art.category
-  if (badgeSource) badgeSource.textContent = '来源: ' + art.source
+  if (badgeSource) badgeSource.textContent = art.source
   if (badgeFreq) badgeFreq.textContent = art.examFreqTag
 
   const titleEl = el('readerArticleTitle')
@@ -129,8 +130,8 @@ export function renderCurrentArticle() {
   const metaCetRatio = el('metaCetRatio')
   const metaLexile = el('metaLexile')
   if (metaWordCount) metaWordCount.textContent = wordCount + ' 词 (约 ' + Math.max(3, Math.round(wordCount / 45)) + ' 分钟)'
-  if (metaCetRatio) metaCetRatio.textContent = art.cetRatio + ' (真题同源密度)'
-  if (metaLexile) metaLexile.textContent = art.lexile + ' · ' + art.examLevel + ' 标准'
+  if (metaCetRatio) metaCetRatio.textContent = art.cetRatio
+  if (metaLexile) metaLexile.textContent = art.lexile
 
   const btnLib = el('btnToggleLibraryStatus')
   const iconLib = el('iconLibraryBtn')
@@ -140,17 +141,17 @@ export function renderCurrentArticle() {
   if (btnLib && iconLib && txtLib && metaLib) {
     if (art.inLibrary) {
       btnLib.className =
-        'px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300'
+        'px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300'
       iconLib.textContent = '✓'
-      txtLib.textContent = '已加入文章库 (点击移出)'
-      metaLib.textContent = '✓ 已在个人文章库'
+      txtLib.textContent = '已入库 (点击移出)'
+      metaLib.textContent = '✓ 已加入文章库'
       metaLib.className = 'font-semibold text-emerald-600'
     } else {
       btnLib.className =
-        'px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 bg-indigo-600 text-white hover:bg-indigo-500'
+        'px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-indigo-700 border border-indigo-200 hover:bg-indigo-50'
       iconLib.textContent = '➕'
-      txtLib.textContent = '加入我的文章库'
-      metaLib.textContent = '待筛选候选 (未入库)'
+      txtLib.textContent = '加入文章库'
+      metaLib.textContent = '未入库'
       metaLib.className = 'font-semibold text-amber-600'
     }
   }
@@ -165,18 +166,18 @@ export function renderCurrentArticle() {
     .map((p, idx) => {
       const cnHiddenClass = s.bilingualOpen ? '' : 'hidden'
       return `
-          <div id="paraRow-${idx}" class="group relative rounded-xl p-2.5 -mx-2 hover:bg-slate-50/70 transition">
+          <div id="paraRow-${idx}" class="group relative rounded-lg p-2.5 -mx-2 hover:bg-slate-100/40 transition">
             <div class="flex items-start justify-between gap-3">
-              <p class="flex-1 leading-[1.95] tracking-normal" style="margin:0;">
-                <span class="inline-block text-xs font-sans font-bold text-indigo-500 mr-1.5 select-none">[P${idx + 1}]</span>
+              <p class="flex-1 leading-[1.98] tracking-normal" style="margin:0;">
+                <span class="inline-block text-[10px] font-mono opacity-30 mr-1.5 select-none">[P${idx + 1}]</span>
                 ${renderTokenizedParagraph(p.en, idx)}
               </p>
-              <div class="flex flex-col gap-1 shrink-0 opacity-75 group-hover:opacity-100 transition font-sans">
-                <button type="button" data-pidx="${idx}" class="btn-speak-para p-1.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-xs" title="情感播音朗读本段">🔊</button>
-                <button type="button" data-pidx="${idx}" class="btn-toggle-para-cn p-1.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-xs" title="展开/收起本段译文">译</button>
+              <div class="flex flex-col gap-1 shrink-0 font-sans opacity-0 group-hover:opacity-100 transition">
+                <button type="button" data-pidx="${idx}" class="btn-speak-para p-1.5 rounded-lg text-xs hover:bg-indigo-50 hover:text-indigo-600" title="情感播音朗读本段">🔊</button>
+                <button type="button" data-pidx="${idx}" class="btn-toggle-para-cn p-1.5 rounded-lg text-xs hover:bg-indigo-50 hover:text-indigo-600" title="展开/收起本段译文">译</button>
               </div>
             </div>
-            <div id="paraCnBox-${idx}" class="${cnHiddenClass} mt-2.5 pl-4 border-l-2 border-indigo-400 font-sans text-sm opacity-85 leading-relaxed">
+            <div id="paraCnBox-${idx}" class="${cnHiddenClass} mt-2.5 pl-3 border-l-2 border-indigo-200/70 font-sans text-sm opacity-85 leading-relaxed">
               ${p.cn}
             </div>
           </div>
@@ -237,6 +238,7 @@ export function selectWordForInspection(rawWord: string, paraText: string, click
     s.rightCollapsed = false
     applySidebarCollapseLayout()
   }
+  showInspectorWordTab()
 
   preloadWordHumanAudio(clean)
 
@@ -427,31 +429,17 @@ export function renderSidebarArticleList() {
     .map((art) => {
       const isActive = art.id === s.currentArticleId
       const borderClass = isActive
-        ? 'border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-600'
-        : 'border-slate-200/80 hover:border-indigo-300'
-      const libBadge = art.inLibrary
-        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">已入库</span>`
-        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">待筛选</span>`
-      const finBadge =
+        ? 'border-indigo-600 bg-indigo-50/60'
+        : 'border-transparent hover:bg-slate-100/60'
+      const line2 =
         art.readStatus === 'finished'
-          ? `<span class="text-[10px] text-emerald-600 font-bold">✅ 已读完</span>`
-          : `<span>考纲词 ${art.cetRatio}</span>`
+          ? `${art.examLevel} · ${art.source} · ✓已读`
+          : `${art.examLevel} · ${art.source} · 考纲词 ${art.cetRatio}`
 
       return `
-          <div data-artid="${art.id}" class="sidebar-art-card p-3 rounded-xl border ${borderClass} cursor-pointer transition space-y-1">
-            <div class="flex items-center justify-between gap-1">
-              <div class="flex items-center gap-1.5">
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">${art.examLevel}</span>
-                <span class="text-[11px] font-medium opacity-75 truncate">${art.source}</span>
-              </div>
-              ${libBadge}
-            </div>
-            <h4 class="text-xs font-bold leading-snug line-clamp-2">${art.title}</h4>
-            <p class="text-[11px] opacity-70 truncate">${art.titleCn}</p>
-            <div class="flex items-center justify-between text-[10px] opacity-65 pt-0.5">
-              <span>${art.category}</span>
-              ${finBadge}
-            </div>
+          <div data-artid="${art.id}" title="${art.titleCn}" class="sidebar-art-card px-2.5 py-2 rounded-lg border-l-[3px] ${borderClass} cursor-pointer transition space-y-0.5">
+            <h4 class="text-xs font-medium leading-snug line-clamp-1">${art.title}</h4>
+            <p class="text-[10.5px] opacity-60 truncate">${line2}</p>
           </div>
         `
     })
