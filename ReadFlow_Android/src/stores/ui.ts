@@ -27,6 +27,7 @@ export const useUiStore = defineStore('ui', () => {
   // Modals
   const customImportOpen = ref(false)
   const guideOpen = ref(false)
+  const settingsOpen = ref(false) // v1.2 聚合设置弹窗
 
   function switchView(view: ViewName) {
     activeView.value = view
@@ -48,6 +49,7 @@ export const useUiStore = defineStore('ui', () => {
     activeContextSentence,
     customImportOpen,
     guideOpen,
+    settingsOpen,
     switchView,
   }
 })

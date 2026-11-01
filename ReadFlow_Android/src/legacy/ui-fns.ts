@@ -6,6 +6,7 @@ import { S } from './state'
 import { useStatsStore } from '../stores/stats'
 import { useSettingsStore } from '../stores/settings'
 import { useUiStore } from '../stores/ui'
+import { applyStatusBarTheme } from '../native/statusbar'
 
 // Stats view renderers register themselves here so reader functions can call
 // them before the stats view is implemented.
@@ -76,6 +77,8 @@ export function applyThemeMode(mode: string) {
   }
   // 持久化（桌面为已批准的行为差异：主题重启保留）
   void useSettingsStore().set('themeMode', mode)
+  // v1.2：状态栏图标/底色随主题联动（浏览器环境自动跳过）
+  void applyStatusBarTheme(mode)
   void S()
 }
 

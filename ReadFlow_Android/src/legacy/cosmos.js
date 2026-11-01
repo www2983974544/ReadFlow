@@ -1,7 +1,10 @@
 // Verbatim port of the legacy cosmos canvas engine (cet_reading_master.html
 // L2957-3355 + L3356-3397). Plain .js on purpose: excluded from type checking.
-// 移动版改动：① 模块级初始化守卫（防止重复进入首页堆叠 RAF 循环）；
-// ② 触屏桥接（touchmove → 合成 mousemove，驱动星环 3D 倾角与星尘尾迹）。
+// 移动版改动（v1.2 静态化，解决首页 60FPS 循环发热耗电）：
+// ① 初始化守卫（防止重复进入首页堆叠绘制）；
+// ② 触屏桥接（touchmove → 合成 mousemove，星环 3D 倾角仍生效）；
+// ③ 渲染一帧静态星空后不再自调度 RAF 循环；resize 时重绘一帧；
+//    秒环/180 刻度波改为 1Hz 更新（由 home.ts 的倒计时秒级 interval 驱动）。
 import { S } from './state'
 
 let cosmosBooted = false
@@ -9,7 +12,7 @@ let cosmosBooted = false
 function initCosmosStarfieldCanvas() {
       const canvas = document.getElementById("cosmosStarfieldCanvas");
       if (!canvas) return;
-      if (cosmosBooted) return; // 移动版守卫：RAF 循环只启动一次
+      if (cosmosBooted) return; // 移动版守卫：静态帧只绘制一次
       cosmosBooted = true;
       const ctx = canvas.getContext("2d");
       let width = 0;
@@ -259,7 +262,16 @@ function initCosmosStarfieldCanvas() {
       }
 
       resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
+      // v1.2 静态化：resize 后防抖重绘一帧（不再自调度 RAF 循环）
+      let resizeRedrawTimer = 0;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeRedrawTimer);
+        resizeRedrawTimer = setTimeout(() => {
+          resizeCanvas();
+          frame = 20;
+          renderUniverseFrame();
+        }, 180);
+      });
 
       function spawnShootingStar() {
         if (shootingStars.length >= 2) return;
@@ -275,12 +287,9 @@ function initCosmosStarfieldCanvas() {
 
       let frame = 0;
       function renderUniverseFrame() {
-        // v1.1: skip all draw work while the home view is not visible (saves CPU);
-        // the loop keeps scheduling so it resumes instantly when unpaused.
-        if (window.__cosmosPaused) {
-          requestAnimationFrame(renderUniverseFrame);
-          return;
-        }
+        // v1.2 静态化：单帧绘制，不再自调度 RAF 循环（帧相位固定为柔和中间值，
+        // 星星亮度/轨道尘埃取静态美观状态）；秒环与 180 刻度波由 home.ts 以
+        // 1Hz 驱动 updateSmoothOrbitalRing60FPS()。
         frame++;
         mouseX += (targetMouseX - mouseX) * 0.06;
         mouseY += (targetMouseY - mouseY) * 0.06;
@@ -422,17 +431,20 @@ function initCosmosStarfieldCanvas() {
           ctx.fill();
         }
 
-        // 8. Smoothly animate 60FPS sub-second orbital ring & 180-tick Gaussian light wave
+        // 8. 60FPS 秒环/刻度波更新（v1.2 静态化后此函数不再自调度；单帧绘制时
+        //    也顺带刷一次刻度波，之后的 1Hz 更新由 home.ts 驱动）
         updateSmoothOrbitalRing60FPS();
-
-        requestAnimationFrame(renderUniverseFrame);
       }
 
-      requestAnimationFrame(renderUniverseFrame);
+      // v1.2 静态化：仅绘制一帧（相位取柔和中间值），无 RAF 循环
+      frame = 19;
+      renderUniverseFrame();
     }
 
 
-function updateSmoothOrbitalRing60FPS() {
+// v1.2 静态化：秒环与 180 刻度高斯波以 1Hz 更新（由 home.ts 的秒级 interval 驱动，
+// 仅在首页活跃时调用，取代原 60FPS 循环内的逐帧更新）
+export function updateSmoothOrbitalRing60FPS() {
       const targetMs = new Date(S().examTargetDate).getTime();
       const nowMs = Date.now();
       const rawDiffMs = Math.max(0, targetMs - nowMs);

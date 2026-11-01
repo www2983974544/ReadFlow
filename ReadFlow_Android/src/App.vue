@@ -13,7 +13,7 @@ import { useVocabStore } from './stores/vocab'
 import { useStatsStore } from './stores/stats'
 import { useSettingsStore } from './stores/settings'
 import { useUiStore } from './stores/ui'
-import { toastVisible, toastText, toastAction, applyThemeMode, applySidebarCollapseLayout, updateTopBadgesAndStats, showToast, dismissToast, runToastAction } from './legacy/ui-fns'
+import { toastVisible, toastText, toastAction, applyThemeMode, setThemeMode, applySidebarCollapseLayout, updateTopBadgesAndStats, showToast, dismissToast, runToastAction, currentThemeMode } from './legacy/ui-fns'
 import { S, hydrateExamSettings } from './legacy/state'
 import {
   clearActiveWordSelection,
@@ -29,10 +29,84 @@ import { initVoices, speakSingleWord } from './core/tts'
 import { APP_VERSION } from './version'
 import { isNative, nativePlugin } from './native/bridge'
 import { readClipboardText } from './native/clipboard'
+import { applyDailyReminder } from './native/reminder'
 import type { Article } from './types'
 
 const ui = useUiStore()
 const bootError = ref('')
+const launchDirect = ref(false)
+
+// ---- v1.2 聚合设置弹窗：打开时把分散在各页的当前值同步进来 ----
+function syncSettingsControls() {
+  const s = S()
+  const settingsStore = useSettingsStore()
+  launchDirect.value = settingsStore.settings.launch_direct_reader === true
+  const accentSel = document.getElementById('selectVoiceAccent') as HTMLSelectElement | null
+  const accentSet = document.getElementById('setVoiceAccent') as HTMLSelectElement | null
+  if (accentSet && accentSel) accentSet.value = accentSel.value
+  const speedSel = document.getElementById('selectVoiceSpeed') as HTMLSelectElement | null
+  const speedSet = document.getElementById('setVoiceSpeed') as HTMLSelectElement | null
+  if (speedSet && speedSel) speedSet.value = speedSel.value
+  const fontRange = document.getElementById('setFontSize') as HTMLInputElement | null
+  if (fontRange) fontRange.value = String(s.fontSizeRem)
+  const homeToggle = document.getElementById('homeReminderToggle') as HTMLInputElement | null
+  const homeTime = document.getElementById('homeReminderTime') as HTMLInputElement | null
+  const setToggle = document.getElementById('setReminderToggle') as HTMLInputElement | null
+  const setTime = document.getElementById('setReminderTime') as HTMLInputElement | null
+  if (setToggle && homeToggle) setToggle.checked = homeToggle.checked
+  if (setTime && homeTime) setTime.value = homeTime.value
+}
+
+watch(ui.settingsOpen, (open) => {
+  if (open) syncSettingsControls()
+})
+
+function onSetLaunchDirect(e: Event) {
+  const on = (e.target as HTMLInputElement).checked
+  void useSettingsStore().set('launch_direct_reader', on)
+  showToast(on ? '🚀 已开启：启动直达外刊精读' : '已关闭：启动停留在星空首页')
+}
+
+function onSetVoiceAccent(e: Event) {
+  const v = (e.target as HTMLSelectElement).value
+  S().voiceAccent = v
+  const readerSel = document.getElementById('selectVoiceAccent') as HTMLSelectElement | null
+  if (readerSel) readerSel.value = v
+  showToast(v === 'UK' ? '🇬🇧 已切换为英式发音' : '🇺🇸 已切换为美式发音')
+}
+
+function onSetVoiceSpeed(e: Event) {
+  const v = parseFloat((e.target as HTMLSelectElement).value) || 1.0
+  S().voiceSpeed = v
+  const readerSel = document.getElementById('selectVoiceSpeed') as HTMLSelectElement | null
+  if (readerSel) readerSel.value = String(v)
+  showToast(`🎙️ 朗读语速已设为 ${v}x`)
+}
+
+function onSetFontSize(e: Event) {
+  const v = parseFloat((e.target as HTMLInputElement).value)
+  if (!isFinite(v)) return
+  S().fontSizeRem = v
+  const container = document.getElementById('readerParagraphsContainer')
+  if (container) container.style.fontSize = v + 'rem'
+}
+
+async function onSetReminder() {
+  const toggle = document.getElementById('setReminderToggle') as HTMLInputElement | null
+  const time = document.getElementById('setReminderTime') as HTMLInputElement | null
+  const homeToggle = document.getElementById('homeReminderToggle') as HTMLInputElement | null
+  const homeTime = document.getElementById('homeReminderTime') as HTMLInputElement | null
+  const enabled = toggle?.checked ?? false
+  const t = time?.value || '20:00'
+  await useSettingsStore().set('reminder_enabled', enabled)
+  await useSettingsStore().set('reminder_time', t)
+  if (homeToggle) homeToggle.checked = enabled
+  if (homeTime) homeTime.value = t
+  const result = await applyDailyReminder(enabled, t)
+  if (result === 'denied') showToast('⚠️ 通知权限被拒绝，请到系统设置开启')
+  else if (enabled) showToast(result === 'native' ? `🔔 每日提醒已开启：每天 ${t}` : '🔔 提醒设置已保存（真机上生效）')
+  else showToast('🔕 每日提醒已关闭')
+}
 
 onMounted(async () => {
   try {
@@ -56,6 +130,11 @@ onMounted(async () => {
       null,
     )
     initTimerDisplay()
+
+    // v1.2 启动直达精读（设置开关）
+    if (useSettingsStore().settings.launch_direct_reader === true) {
+      ui.switchView('reader')
+    }
 
     const defaultSampleSent = 'Artificial intelligence is beginning to transform the modern workplace.'
     const freeInput = document.getElementById('inputFreeTranslate') as HTMLTextAreaElement | null
@@ -90,6 +169,10 @@ function setupBackButton() {
   const appPlugin = nativePlugin<{ addListener: (ev: string, cb: () => void) => void }>('App')
   if (!appPlugin) return
   appPlugin.addListener('backButton', () => {
+    if (ui.settingsOpen) {
+      ui.settingsOpen = false
+      return
+    }
     if (ui.guideOpen) {
       ui.guideOpen = false
       return
@@ -287,6 +370,75 @@ async function submitCustomArticle() {
     </div>
   </div>
 
+  <!-- ⚙️ 聚合设置弹窗（v1.2：主题/启动/提醒/朗读 一站式） -->
+  <div v-if="ui.settingsOpen" class="modal-mask" @click.self="ui.settingsOpen = false">
+    <div class="modal-card settings-card">
+      <div class="modal-head">
+        <h3 class="modal-title">⚙️ 设置</h3>
+        <button type="button" class="modal-close" @click="ui.settingsOpen = false">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="set-group">
+          <div class="set-group-title">🎨 外观</div>
+          <div class="set-theme-row">
+            <button type="button" class="chip-btn" :class="{ 'chip-active': currentThemeMode() === 'light' }" @click="setThemeMode('light')">☀️ 明亮</button>
+            <button type="button" class="chip-btn" :class="{ 'chip-active': currentThemeMode() === 'sepia' }" @click="setThemeMode('sepia')">📜 护眼</button>
+            <button type="button" class="chip-btn" :class="{ 'chip-active': currentThemeMode() === 'dark' }" @click="setThemeMode('dark')">🌙 夜间</button>
+            <button type="button" class="chip-btn" :class="{ 'chip-active': currentThemeMode() === 'system' }" @click="setThemeMode('system')">🌗 跟随系统</button>
+          </div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-group-title">🚀 启动</div>
+          <label class="set-row">
+            <span class="set-label">启动直达外刊精读<span class="set-sub">打开 App 直接进入精读页，跳过星空首页</span></span>
+            <input type="checkbox" id="setLaunchDirect" class="set-switch" :checked="launchDirect" @change="onSetLaunchDirect" />
+          </label>
+        </div>
+
+        <div class="set-group">
+          <div class="set-group-title">🔔 学习提醒</div>
+          <label class="set-row">
+            <span class="set-label">每日提醒<span class="set-sub">到点本地通知催你打卡（真机生效）</span></span>
+            <input type="checkbox" id="setReminderToggle" class="set-switch" @change="onSetReminder" />
+          </label>
+          <label class="set-row">
+            <span class="set-label">提醒时间</span>
+            <input type="time" id="setReminderTime" class="set-input" @change="onSetReminder" />
+          </label>
+        </div>
+
+        <div class="set-group">
+          <div class="set-group-title">🎙️ 朗读与字号</div>
+          <label class="set-row">
+            <span class="set-label">单词发音口音</span>
+            <select id="setVoiceAccent" class="set-input" @change="onSetVoiceAccent">
+              <option value="US">🇺🇸 美音</option>
+              <option value="UK">🇬🇧 英音</option>
+            </select>
+          </label>
+          <label class="set-row">
+            <span class="set-label">文章朗读语速</span>
+            <select id="setVoiceSpeed" class="set-input" @change="onSetVoiceSpeed">
+              <option value="1.0">1.0x 标准</option>
+              <option value="0.88">0.88x 慢读</option>
+              <option value="0.78">0.78x 跟读</option>
+              <option value="1.12">1.12x 进阶</option>
+            </select>
+          </label>
+          <label class="set-row">
+            <span class="set-label">正文字号</span>
+            <input type="range" id="setFontSize" min="0.95" max="1.45" step="0.05" class="set-range flex-1" @change="onSetFontSize" />
+          </label>
+        </div>
+        <p class="set-hint">与精读工具栏 / 首页配置栏中的同名设置实时同步。</p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="primary-btn" @click="ui.settingsOpen = false">完成</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ❓ 上手指南与版本记录弹窗 -->
   <div v-if="ui.guideOpen" class="modal-mask" @click.self="ui.guideOpen = false">
     <div class="modal-card guide-card">
@@ -308,7 +460,8 @@ async function submitCustomArticle() {
         <div class="guide-box">
           <strong>📜 Android 版更新记录 (CHANGELOG)</strong>
           <ul>
-            <li><strong>v1.1（当前）：</strong>六项体验提升——计时防锁屏、深色跟随系统（🌗 档）、查词台快捷标注条、划词翻译气泡、抓取源健康度与单源重试、每日学习提醒。</li>
+            <li><strong>v1.2（当前）：</strong>十二项简洁易用专项——静态星空首页（去 60FPS 循环）、查词台下拉关闭/点空白收起、删除可撤销与清零二次确认、状态栏跟随主题、⚙️ 聚合设置弹窗、启动直达精读、工具栏横滑提示、阅读进度条与位置记忆、单词库搜索、剪贴板一键导入、段落朗读悬浮球、Toast 可交互。</li>
+            <li><strong>v1.1：</strong>六项体验提升——计时防锁屏、深色跟随系统（🌗 档）、查词台快捷标注条、划词翻译气泡、抓取源健康度与单源重试、每日学习提醒。</li>
             <li><strong>v1.0（首发）：</strong>以桌面 V2.1 功能集为基准的移动版——底部标签栏六视图；精读页目录抽屉 + 三 Tab 查词台弹层 + 专注阅读模式；客户端真 RSS 爬虫（Readability 提取、Wikipedia 兜底、12 秒时限）；有道真人朗读 + 系统 TTS 兜底；导出走系统分享面板；返回键逐级导航；三主题与设置持久化；安徽专升本全链路；文章库三联筛选；单词库闪卡；统计热力图与跨实体清零守卫。</li>
             <li><strong>功能基线：</strong>桌面版 v2.x 迭代史见桌面端《ReadFlow_版本更新日志(CHANGELOG)》。</li>
           </ul>
@@ -488,5 +641,76 @@ async function submitCustomArticle() {
   display: flex;
   justify-content: flex-end;
   padding: 10px 16px calc(14px + env(safe-area-inset-bottom));
+}
+.settings-body {
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.set-group {
+  border: 1px solid var(--border-col);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background-color: var(--bg-subcard);
+}
+.set-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.set-theme-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.set-row + .set-row {
+  border-top: 1px dashed var(--border-col);
+}
+.set-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.set-sub {
+  font-size: 10.5px;
+  font-weight: 400;
+  opacity: 0.65;
+  margin-top: 1px;
+}
+.set-switch {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+}
+.set-input {
+  border: 1px solid var(--border-col);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  outline: none;
+}
+.set-range {
+  accent-color: var(--accent);
+}
+.set-hint {
+  margin: 0;
+  font-size: 10.5px;
+  opacity: 0.6;
+  text-align: center;
 }
 </style>

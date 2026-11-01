@@ -1,7 +1,7 @@
 // Home launchpad: cosmos canvas, countdown display & exam config
 // （复制自桌面 frontend/src/legacy/home.ts@v2.1；移动版增加重复绑定守卫
 //   与 v1.1 每日学习提醒设置行）
-import { initCosmosStarfieldCanvas } from './cosmos'
+import { initCosmosStarfieldCanvas, updateSmoothOrbitalRing60FPS } from './cosmos'
 import { S } from './state'
 import { showToast } from './ui-fns'
 import { useSettingsStore } from '../stores/settings'
@@ -59,7 +59,11 @@ export function initHomeView() {
   if (dateInput) dateInput.value = S().examTargetDate
   updateHomeCountdownDisplay()
   if (!countdownTimerId) {
-    countdownTimerId = window.setInterval(updateHomeCountdownDisplay, 1000)
+    // v1.2 静态化：秒环/180 刻度波从 60FPS 循环改为随倒计时 1Hz 刷新（仅首页活跃时）
+    countdownTimerId = window.setInterval(() => {
+      updateHomeCountdownDisplay()
+      if (useUiStore().activeView === 'home') updateSmoothOrbitalRing60FPS()
+    }, 1000)
   }
 
   // 事件绑定守卫：App.vue 的 immediate watch 会在 DOM 就绪前调用本函数，

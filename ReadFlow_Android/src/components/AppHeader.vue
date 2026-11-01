@@ -67,6 +67,7 @@ void applyThemeMode
           @click="setTheme('system')"
         >🌗</button>
       </div>
+      <button type="button" class="guide-btn" title="设置" @click="ui.settingsOpen = true">⚙️</button>
       <button type="button" class="guide-btn" title="上手指南与版本记录" @click="ui.guideOpen = true">❓</button>
     </div>
   </header>
