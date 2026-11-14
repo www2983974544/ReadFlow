@@ -3,12 +3,17 @@ open-book glyph (matching the in-app brand logo). Produces ReadFlow.ico.
 
 Usage: .venv/Scripts/python scripts/make_icon.py
 """
+import re
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 SIZE = 256
+VERSION = re.search(
+    r"APP_VERSION = 'v([\d.]+)'",
+    (ROOT / "frontend/src/version.ts").read_text(encoding="utf-8"),
+).group(1)
 
 
 def build_icon() -> Image.Image:
@@ -44,6 +49,18 @@ def build_icon() -> Image.Image:
         inset = 14
         d.line([(cx - spread + inset, y), (cx - 14, y + 4)], fill=ink, width=8)
         d.line([(cx + 14, y + 4), (cx + spread - inset, y)], fill=ink, width=8)
+
+    # version badge in the lower-right corner; text follows frontend/src/version.ts
+    badge = [164, 194, 246, 240]
+    d.rounded_rectangle(badge, radius=12, fill=(251, 191, 36, 255))
+    font = ImageFont.load_default(size=30)
+    d.text(
+        ((badge[0] + badge[2]) / 2, (badge[1] + badge[3]) / 2),
+        VERSION,
+        font=font,
+        fill=(41, 37, 36, 255),
+        anchor="mm",
+    )
 
     return img
 

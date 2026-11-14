@@ -234,7 +234,16 @@ onMounted(async () => {
           <strong>📜 版本迭代历史（最新在上）：</strong>
           <ul class="space-y-2.5">
             <li>
-              <strong>v2.1（当前版本 · 2026-11-01）：</strong>
+              <strong>v2.2（当前版本 · 2026-11-14）：</strong>
+              <ul class="list-disc pl-5 space-y-0.5 mt-1">
+                <li>点正文空白自动收起右侧查词栏，并清除选词高亮</li>
+                <li>内置离线词典扩容至 21,835 条（ECDICT，MIT），覆盖四六级、考研、牛津 3000 与外刊高频词</li>
+                <li>未收录词明确提示「词典未收录」，不再伪造释义、音标、派生词与同义词</li>
+                <li>应用图标新增 v2.2 版本角标；左上角版本徽章同步</li>
+              </ul>
+            </li>
+            <li>
+              <strong>v2.1（2026-11-01）：</strong>
               <ul class="list-disc pl-5 space-y-0.5 mt-1">
                 <li>左上角版本徽章与 ❓ 更新记录弹窗随版本号同步显示</li>
                 <li>更新记录弹窗重写为分层无序列表精简版</li>
