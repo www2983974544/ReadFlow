@@ -159,6 +159,10 @@ onMounted(() => {
 
     if (!target.closest('button, select, input, a')) {
       clearActiveWordSelection()
+      if (!s.rightCollapsed) {
+        s.rightCollapsed = true
+        applySidebarCollapseLayout()
+      }
     }
   })
 
