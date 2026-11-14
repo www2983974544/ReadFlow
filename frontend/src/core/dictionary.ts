@@ -42,10 +42,10 @@ Object.keys(RAW).forEach((k) => {
       ? 'CET-6 核心'
       : arr[3].includes('CET-4')
         ? 'CET-4 高频'
-        : '牛津核心词',
+        : '外刊高频词',
     root: arr[3],
-    derivatives: arr[4] || arr[0] + ' ' + k + ' (核心词形)',
-    synonyms: arr[5] || 'core examination vocabulary',
+    derivatives: arr[4] || '暂无词形变化数据',
+    synonyms: arr[5] || '暂无同义词数据',
   }
 })
 
@@ -169,7 +169,7 @@ export function lookupWordDefinitionSync(rawWord: string): WordInfo {
       pos: entry.pos,
       cn: entry.cn,
       shortCn: entry.rawCn ? entry.rawCn.split(/[；;，,]/)[0] : entry.cn,
-      enDef: 'Oxford 3000 & CET-4/6 Examination Core Lexicon (Offline Instant Lookup).',
+      enDef: 'Offline English-Chinese dictionary (ECDICT, MIT).',
       level: entry.level,
       root: entry.root,
       derivatives: entry.derivatives,
@@ -188,15 +188,15 @@ export function lookupWordDefinitionSync(rawWord: string): WordInfo {
     return {
       word: clean,
       lemma: lemma,
-      phonetic: '/' + lemma + '/',
+      phonetic: '',
       pos: '复合词',
       cn: '复合词组：' + parts.join(' + '),
       shortCn: parts.join('+'),
       enDef: 'Compound word analyzed by offline morphological engine.',
       level: '四六级复合词',
       root: '由连字符构成的复合词：' + parts.join(' + '),
-      derivatives: firstEntry ? firstEntry.derivatives : `adj./n. ${clean}`,
-      synonyms: firstEntry ? firstEntry.synonyms : 'compound expression',
+      derivatives: firstEntry ? firstEntry.derivatives : '',
+      synonyms: firstEntry ? firstEntry.synonyms : '',
       isOfflineHit: true,
     }
   }
@@ -237,15 +237,15 @@ export function lookupWordDefinitionSync(rawWord: string): WordInfo {
   return {
     word: clean,
     lemma: lemma,
-    phonetic: '/' + lemma + '/',
+    phonetic: '',
     pos: detectedPos,
-    cn: detectedPos + ' 学术/外刊拓展词（' + (morphNotes[0] || '可结合语境理解或添加批注') + '）',
+    cn: '词典未收录（可添加自定义释义）',
     shortCn: clean,
-    enDef: 'Offline morphological analysis ready.',
-    level: '拓展阅读词汇',
-    root: morphNotes.length > 0 ? morphNotes.join('；') : '可结合上下文语境理解，并在下方输入框保存个人自定义释义',
-    derivatives: `n. ${lemma}tion / adj. ${lemma}able / adv. ${lemma}ly`,
-    synonyms: 'contextual academic vocabulary',
+    enDef: '',
+    level: '未收录',
+    root: morphNotes.length > 0 ? morphNotes.join('；') : '',
+    derivatives: '',
+    synonyms: '',
     isOfflineHit: false,
   }
 }
