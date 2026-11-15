@@ -7,7 +7,7 @@
 四六级同源外刊智能获取与精读系统 —— 逐词精读、离线查词、真 RSS 抓取与学习统计，提供 Windows 桌面版与 Android 移动版。
 
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE)
-[![Windows v2.1](https://img.shields.io/badge/Windows-v2.1-0078D6)](https://github.com/www2983974544/ReadFlow/releases/tag/v2.1)
+[![Windows v2.2](https://img.shields.io/badge/Windows-v2.2-0078D6)](https://github.com/www2983974544/ReadFlow/releases/tag/v2.2)
 [![Android v1.2](https://img.shields.io/badge/Android-v1.2-3DDC84)](https://github.com/www2983974544/ReadFlow/releases/tag/android-v1.2)
 
 > **源码公开，禁止任何商业用途。** 采用 PolyForm Noncommercial License 1.0.0，详见 [LICENSE](LICENSE)。
@@ -20,7 +20,7 @@ ReadFlow 把英文外刊文章变成可逐词精读的学习材料：点词即�
 
 | | Windows 桌面版 | Android 移动版 |
 |---|---|---|
-| 当前版本 | v2.1 | v1.2（versionCode 6） |
+| 当前版本 | v2.2 | v1.2（versionCode 6） |
 | 运行环境 | Windows 10/11（自带 WebView2） | Android 7.0+（API 24） |
 | 技术栈 | Vue 3 + FastAPI + SQLite + pywebview | Vue 3 + Capacitor 8 + localStorage |
 | 安装包 | 单个 exe，约 40 MB | APK，约 4.5 MB |
@@ -40,7 +40,7 @@ ReadFlow 把英文外刊文章变成可逐词精读的学习材料：点词即�
 
 | 版本 | 下载 | 说明 |
 |---|---|---|
-| Windows v2.1 | [Releases · v2.1](https://github.com/www2983974544/ReadFlow/releases/tag/v2.1) | 下载 `ReadFlow.exe` 后双击即可，无需安装 Python / Node |
+| Windows v2.2 | [Releases · v2.2](https://github.com/www2983974544/ReadFlow/releases/tag/v2.2) | 下载 `ReadFlow.exe` 后双击即可，无需安装 Python / Node |
 | Android v1.2 | [Releases · android-v1.2](https://github.com/www2983974544/ReadFlow/releases/tag/android-v1.2) | 把 APK 传到手机安装，需允许「安装未知来源应用」 |
 
 安装包作为 Release 附件发布，**不在 Git 仓库中**（`dist/` 与 `*.exe` 已被忽略）。安卓版使用 debug 签名，覆盖安装同一密钥签名的旧版可直接升级；若提示签名冲突，需先卸载旧版（会清除应用内数据）。
